@@ -23,3 +23,7 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> PhpStorm project file ###
+/.idea
+###< PhpStorm project file ###
