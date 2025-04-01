@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-primary">
+    <a class="navbar-brand ms-3" href="{{ path("app_main") }}">
+        <img src="{{ asset("images/logoENI.png") }}" width="50" height="50" class="d-inline-block" alt="">
+        <span class="d-inlineblock align-middle">Sortir.com</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav me-5">
+            {% set currentPath = app.request.attributes.get('_route') %}
+            {# %  if app.user %#}
+            {%  if true %}{#  todo: repasser en user controle #}
+                {%  if is_granted('ROLE_ADMIN') %}
+                    <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_main' %}active{% endif %}">
+                        <a class="nav-link" href="{{ path("app_main") }}">Administration</a>
+                    </li>
+                {%  endif %}
+                <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_main' %}active{% endif %}">
+                    <a class="nav-link" href="{{ path("app_main") }}">Accueil</a>
+                </li>
+                <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_main' %}active{% endif %}">
+                    <a class="nav-link" href="{{ path("app_main") }}">Mon Profil</a>
+                </li>
+                <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_logout' %}active{% endif %}">
+                    <a class="nav-link" href="{{ path("app_logout") }}">Se déconnecter</a>
+                </li>
+            {%  endif %}
+        </ul>
+    </div>
+</nav>
