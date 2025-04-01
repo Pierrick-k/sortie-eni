@@ -24,7 +24,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         for($i=0;$i<15;$i++){
             $sortie= new Sortie();
             $sortie->setNom($faker->sentence(10));
-            $sortie->setDuree((new \DateTime())->modify('+' . $faker->numberBetween(1, 50) . ' minutes'));
+            $sortie->setDuree($faker->numberBetween(1, 50));
 
             $sortie->setLieu($this->getReference('lieu'.$faker->numberBetween(0,9),Lieu::class));
             $sortie->setCampus($this->getReference('campus'.$faker->numberBetween(1,5),Campus::class));
