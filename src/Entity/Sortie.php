@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SortieRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
 class Sortie
@@ -14,32 +15,49 @@ class Sortie
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\NotBlank(message:'Le nom de la sortie doit être renseigné')]
+    #[Assert\Length(min: 3, max: 100,
+        minMessage:'Le nom de la sortie doit être supérieur à 2 caractères',
+        maxMessage:'Le nom de la sortie doit être inférieur à 255 caractères')]
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
     #[ORM\Column]
+    #[Assert\GreaterThan('now')]
+    #[Assert\NotBlank(message:'La date et heure de début doit être renseigné')]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message:'La durée doit être renseigné')]
+    #[Assert\Range(min: 1, max: 1440,
+        notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes' )]
     private ?int $duree = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message:'La date limite d\'inscription doit être renseignée')]
+    #[Assert\GreaterThan('now')]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
     #[ORM\Column]
+    #[Assert\NotNull(message:'Le nombre d\'incription maximum doit être renseigné')]
     private ?int $nbInscriptionMax = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Length(min: 5, max: 255,
+        minMessage: 'Les infos doivent avoir minimum 5 caractères',
+        maxMessage: 'Les infos doivent être en dessous de 255 caractères')]
     private ?string $infosSortie = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Etat $etat = null;
 
+    #[Assert\NotBlank(message:'Le campus doit être renseigné')]
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Campus $campus = null;
 
+    #[Assert\NotBlank(message:'La lieu de la sortie doit être renseigné')]
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Lieu $lieu = null;
