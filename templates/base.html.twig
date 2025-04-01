@@ -27,6 +27,11 @@
             {%  include("_navbar.html.twig") %}
         </header>
         <main class="container">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div id="label" class="alert alert-{{ label }}">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
             {% block body %}Page vide{% endblock %}
         </main>
         <footer>
