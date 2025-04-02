@@ -43,7 +43,7 @@ final class SortieController extends AbstractController
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
-            $etat = $etatRepository->find(92);
+            $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
             $sortie->setEtat($etat);
             $em->persist($sortie);
             $em->flush();
@@ -54,14 +54,12 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-/*
+
     #[Route('/update/{id}', name:'_update',methods:['GET','POST'])]
     public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, EtatRepository $etatRepository): Response{
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
-        if($sortieForm->isSubmitted()){
-            $etat = $etatRepository->find(92);
-            $sortie->setEtat($etat);
+        if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été modifiée !');
@@ -71,6 +69,6 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-*/
+
 
 }
