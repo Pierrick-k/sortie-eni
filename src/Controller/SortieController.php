@@ -2,10 +2,13 @@
 
 namespace App\Controller;
 
+
 use App\Entity\Sortie;
 use App\Form\SortieType;
 use App\Repository\EtatRepository;
+use App\Form\FiltreSortieType;
 use App\Repository\SortieRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,14 +18,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/sortie', name: 'sortie')]
 final class SortieController extends AbstractController
 {
-    #[Route('/liste', name: '_liste', methods: ['GET'])]
-    public function liste(): Response
-    {
-        return $this->render('sortie/index.html.twig', [
-            'controller_name' => 'SortieController',
-        ]);
-    }
-
     #[Route('/detail/{id}', name:'_detail', methods: ['GET'])]
     public function detail($id, SortieRepository $sortieRepository): Response{
         $sortie = $sortieRepository->findSortieById($id);
@@ -36,8 +31,9 @@ final class SortieController extends AbstractController
         ]);
     }
 
+
     #[Route('/create', name:'_create',methods:['GET','POST'])]
-    public function create(EntityManagerInterface $em, Request $request, EtatRepository $etatRepository): Response{
+    public function create(EntityManagerInterface $em, Request $request, EtatRepository $etatRepository, UserRepository $userRepository): Response{
         $sortie = new Sortie();
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
@@ -51,6 +47,9 @@ final class SortieController extends AbstractController
                 $etat = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
                 $sortie->setEtat($etat);
             }
+            //TODO: A enlever une fois connexion mis en place
+            $user = $userRepository->findOneBy(['email'=>'admin@eni.fr']);
+            $sortie->setOrganisateur($user);
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été créée !');
@@ -86,4 +85,16 @@ final class SortieController extends AbstractController
     }
 
 
+
+    #[Route('/list', name:'_list', methods: ['GET'])]
+    public function list(SortieRepository $sortieRepository): Response{
+        $sorties = $sortieRepository->findAll();
+
+        $FiltreSortie = $this->createForm(FiltreSortieType::class);
+
+        return $this->render('sortie/list.html.twig', [
+            'sorties' => $sorties,
+            'FiltreSortie' => $FiltreSortie,
+        ]);
+    }
 }

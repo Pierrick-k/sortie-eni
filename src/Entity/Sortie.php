@@ -16,31 +16,31 @@ class Sortie
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank(message:'Le nom de la sortie doit être renseigné')]
+    #[Assert\NotBlank(message: 'Le nom de la sortie doit être renseigné')]
     #[Assert\Length(min: 3, max: 100,
-        minMessage:'Le nom de la sortie doit être supérieur à 2 caractères',
-        maxMessage:'Le nom de la sortie doit être inférieur à 255 caractères')]
+        minMessage: 'Le nom de la sortie doit être supérieur à 2 caractères',
+        maxMessage: 'Le nom de la sortie doit être inférieur à 255 caractères')]
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
     #[ORM\Column]
     #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
-    #[Assert\NotBlank(message:'La date et heure de début doit être renseigné')]
+    #[Assert\NotBlank(message: 'La date et heure de début doit être renseigné')]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\Column]
-    #[Assert\NotNull(message:'La durée doit être renseigné')]
-    #[Assert\Range(min: 1, max: 1440,
-        notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes')]
+    #[Assert\NotNull(message: 'La durée doit être renseigné')]
+    #[Assert\Range(notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes', min: 1,
+        max: 1440)]
     private ?int $duree = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message:'La date limite d\'inscription doit être renseignée')]
+    #[Assert\NotBlank(message: 'La date limite d\'inscription doit être renseignée')]
     #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
     #[ORM\Column]
-    #[Assert\NotNull(message:'Le nombre d\'incription maximum doit être renseigné')]
+    #[Assert\NotNull(message: 'Le nombre d\'incription maximum doit être renseigné')]
     private ?int $nbInscriptionMax = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -53,15 +53,19 @@ class Sortie
     #[ORM\JoinColumn(nullable: false)]
     private ?Etat $etat = null;
 
-    #[Assert\NotBlank(message:'Le campus doit être renseigné')]
+    #[Assert\NotBlank(message: 'Le campus doit être renseigné')]
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Campus $campus = null;
 
-    #[Assert\NotBlank(message:'La lieu de la sortie doit être renseigné')]
+    #[Assert\NotBlank(message: 'La lieu de la sortie doit être renseigné')]
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Lieu $lieu = null;
+
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $organisateur = null;
 
     public function getId(): ?int
     {
@@ -176,6 +180,7 @@ class Sortie
         return $this;
     }
 
+
     #[Assert\Callback]
     public function validateDates(ExecutionContextInterface $context): void
     {
@@ -186,5 +191,17 @@ class Sortie
                     ->addViolation();
             }
         }
+    }
+
+    public function getOrganisateur(): ?User
+    {
+        return $this->organisateur;
+    }
+
+    public function setOrganisateur(?User $organisateur): static
+    {
+        $this->organisateur = $organisateur;
+
+        return $this;
     }
 }
