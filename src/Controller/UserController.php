@@ -36,4 +36,13 @@ final class UserController extends AbstractController
             'userForm' => $userForm,
         ]);
     }
+
+    #[Route('/detail/{id}', name: 'detail', methods: ['GET'])]
+public function detail($id, UserRepository $userRepository): Response{
+        $user = $userRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException();
+        }
+        return $this->render('user/detail.html.twig', ["user" => $user]);
+    }
 }

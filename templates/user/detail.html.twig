@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/user.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="profile">
+        <h2>Pseudo</h2>
+        <div class="profile-details">
+            <div class="detail"><span class="name">Campus:</span> <span class="value">campus</span></div>
+            <div class="detail"><span class="name">Nom:</span> <span class="value">{{ user.nom }}</span></div>
+            <div class="detail"><span class="name">Prénom:</span> <span class="value">{{ user.prenom }}</span></div>
+            <div class="detail"><span class="name">Email:</span> <span class="value">{{ user.email }}</span></div>
+            <div class="detail"><span class="name">Téléphone:</span> <span class="value">{{ user.telephone }}</span></div>
+        </div>
+    </div>
+{% endblock %}
