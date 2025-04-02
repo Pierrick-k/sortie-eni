@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{  parent() }} detail Sortie{% endblock %}
+{% block stylesheets %}
+   {#  <link href="{{  asset('css/bootstrap-datepicker.css') }}" rel="stylesheet"/> #}
+    <link rel="stylesheet" href="{{ asset('css/sortie.css') }}"
+{% endblock %}
+{#
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/bootstrap-datepicker.min.js') }}"></script>
+{% endblock %}
+#}
+
+{% block body %}
+    <div>
+        {{ form(FiltreSortie) }}
+    </div>
+    <div class="table">
+        <table>
+            <thead><tr>
+                <th>Nom de la sortie</th>
+                <th>Date de la sortie</th>
+                <th>Clôture</th>
+                <th>Nombre de places</th>
+                <th>Etat</th>
+                <th>Inscrit</th>
+                <th>Organisateur</th>
+                <th>Actions</th>
+            </tr></thead>
+            <tbody>
+                {% for sortie in sorties %}
+                <tr>
+                    <td>{{ sortie.nom }}</td>
+                    <td>{{ sortie.dateHeureDebut|date("d/m/Y H:i") }}</td>
+                    <td>{{ sortie.dateLimiteInscription|date("d/m/Y") }}</td>
+                    <td>{# { sortie.participants|length }}/{{ sortie.nbInscriptionMax }#}1/8</td>
+                    <td>{{ sortie.etat.libelle }}</td>
+                    <td>{{ sortie.etat.libelle }}</td>
+                    <td>{{ sortie.etat.libelle }}</td>
+                    <td>{{ sortie.infosSortie }}</td>
+                </tr>
+                {%  endfor %}
+            </tbody>
+        </table>
+    </div>
+    {#
+    <script>
+        document.getElementsByClassName('js-datepicker').datepicker({
+            format: "dd-mm-yyyy",
+            language: "fr",
+            multidate: false,
+            todayHighlight: true
+        });
+</script>
+    #}
+{% endblock %}

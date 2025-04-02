@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\FiltreSortieType;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,6 +24,18 @@ final class SortieController extends AbstractController
         $sortie = $sortieRepository->find($id);
         return $this->render('sortie/detail.html.twig', [
             'sortie' => $sortie,
+        ]);
+    }
+
+    #[Route('/list', name:'_list', methods: ['GET'])]
+    public function list(SortieRepository $sortieRepository): Response{
+        $sorties = $sortieRepository->findAll();
+
+        $FiltreSortie = $this->createForm(FiltreSortieType::class);
+
+        return $this->render('sortie/list.html.twig', [
+            'sorties' => $sorties,
+            'FiltreSortie' => $FiltreSortie,
         ]);
     }
 }
