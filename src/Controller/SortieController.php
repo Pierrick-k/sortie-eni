@@ -6,7 +6,6 @@ use App\Entity\Sortie;
 use App\Form\SortieType;
 use App\Repository\EtatRepository;
 use App\Repository\SortieRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,8 +42,15 @@ final class SortieController extends AbstractController
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
-            $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
-            $sortie->setEtat($etat);
+            $action = $request->get('action');
+            if($action === "Enregistrer"){
+                $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
+                $sortie->setEtat($etat);
+            }
+            if($action === "Publier"){
+                $etat = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
+                $sortie->setEtat($etat);
+            }
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été créée !');
@@ -60,6 +66,15 @@ final class SortieController extends AbstractController
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
+            $action = $request->get('action');
+            if($action === "Enregistrer"){
+                $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
+                $sortie->setEtat($etat);
+            }
+            if($action === "Publier"){
+                $etat = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
+                $sortie->setEtat($etat);
+            }
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été modifiée !');
