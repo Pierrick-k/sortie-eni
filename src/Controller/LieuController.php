@@ -10,11 +10,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class LieuController extends AbstractController
-{/*
-    public function __construct(private readonly LieuService $lieuService)
-    {
-    }*/
-
+{
     #[Route('/api/lieu/{id}', name: 'api_lieu', methods: ['GET'])]
     public function getLieu(int $id, LieuRepository $lieuRepository, SerializerInterface $serializer): JsonResponse
     {
