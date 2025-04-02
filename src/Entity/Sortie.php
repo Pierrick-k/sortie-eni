@@ -6,6 +6,7 @@ use App\Repository\SortieRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
 class Sortie
@@ -30,7 +31,7 @@ class Sortie
     #[ORM\Column]
     #[Assert\NotNull(message:'La durée doit être renseigné')]
     #[Assert\Range(min: 1, max: 1440,
-        notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes' )]
+        notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes')]
     private ?int $duree = null;
 
     #[ORM\Column]
@@ -173,5 +174,17 @@ class Sortie
         $this->lieu = $lieu;
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateDates(ExecutionContextInterface $context): void
+    {
+        if ($this->dateHeureDebut && $this->dateLimiteInscription) {
+            if ($this->dateHeureDebut <= $this->dateLimiteInscription) {
+                $context->buildViolation('La date de début de la sortie doit être ultérieure à celle de la date de limite d\'inscription')
+                    ->atPath('stop')
+                    ->addViolation();
+            }
+        }
     }
 }
