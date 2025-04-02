@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Sortie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -14,6 +15,21 @@ class SortieRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Sortie::class);
+    }
+
+    public function findSortieById(int $id){
+        $queryBuilder = $this->createQueryBuilder('s');
+        $queryBuilder->addSelect('l')
+            ->leftJoin('s.lieu','l')
+            ->addSelect('c')
+            ->leftJoin('l.ville', 'v')
+            ->addSelect('v')
+            ->leftJoin('s.campus','c')
+            ->where('s.id = :id');
+        $queryBuilder->setParameter('id', $id);
+        $query = $queryBuilder->getQuery();
+        $query->setMaxResults(1);
+        return $query->getOneOrNullResult();
     }
 
 //    /**

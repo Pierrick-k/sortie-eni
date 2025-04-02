@@ -1,93 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sortie eni | detail Sortie{% endblock %}
+{% block title %} {{ parent() }} | detail Sortie{% endblock %}
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset('css/sortie.css') }}"
+    <link rel="stylesheet" href="{{ asset('css/sortie.css') }}">
 {% endblock %}
-
 {% block body %}
     <div class="detail">
         <h1>Afficher une sortie</h1>
-        <div class="groupe-detail">
-            <div class="paire">
+        <div class="div-detail">
+            <div class="groupe">
                 <span>Nom de la sortie</span>
                 <span>{{ sortie.nom }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Date et heure de la sortie</span>
                 <span>{{ sortie.dateHeureDebut | date("H:i:s d-m-Y") }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Date limite d'inscription</span>
                 <span>{{ sortie.dateLimiteInscription | date('d-m-Y') }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Nombre de places</span>
                 <span>{{ sortie.nbInscriptionMax }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Durée (en minutes)</span>
-                <span>{{ (sortie.duree|date('H') * 60) + (sortie.duree|date('i')) }}</span>
+                <span>{{ sortie.duree }}</span>
             </div>
         </div>
-        <div class="groupe-detail">
-            <div class="paire">
+        <div class="div-detail">
+            <div class="groupe">
                 <span>Campus</span>
                 <span>{{ sortie.campus.nom }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Ville</span>
                 <span>{{ sortie.lieu.ville.nom }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Lieu</span>
                 <span>{{ sortie.lieu.nom }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Rue</span>
                 <span>{{ sortie.lieu.rue }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Code postal</span>
                 <span>{{ sortie.lieu.ville.codePostal }}</span>
             </div>
-
-            <div class="paire">
+            <div class="groupe">
                 <span>Latitude / longitude</span>
                 <span>{{ sortie.lieu.latitude }} {{ sortie.lieu.longitude }}</span>
             </div>
         </div>
         <div>
-            <div class="paire">
+            <div class="groupe">
                 <span>Description et infos</span>
                 <span>{{ sortie.infosSortie }}</span>
             </div>
         </div>
-
-        <h4>Liste des participants inscrits</h4>
-        <table>
-            <thead>
-            <tr>
-                <th>Pseudo</th>
-                <th>Nom</th>
-            </tr>
-            </thead>
-            <tbody>
-            {# for participant in sortie.participants #}
-            <tr>
-                <td></td>
-                <td></td>
-            </tr>
-            {# endfor #}
-            </tbody>
-        </table>
+        <div>
+            <h4>Liste des participants inscrits</h4>
+            <table>
+                <thead>
+                <tr>
+                    <th>Pseudo</th>
+                    <th>Nom</th>
+                </tr>
+                </thead>
+                <tbody>
+                {# for participant in sortie.participants #}
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                {# endfor #}
+                </tbody>
+            </table>
+        </div>
+        <a class="btn btn-success" href="{{ path('sortie_update',{id: sortie.id}) }}">Modifier</a>
     </div>
 {% endblock %}

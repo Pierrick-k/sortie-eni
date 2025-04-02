@@ -11,20 +11,24 @@ h1{
     text-align: center;
 }
 
-.groupe-detail{
+.div-detail{
     display: inline-block;
     vertical-align: top;
     width:45%;
 }
 
-.paire {
+.groupe {
     display: flex;
     margin: 15px 0 15px 0;
 }
 
-.paire span:first-child {
+.groupe span:first-child {
     width: 200px;
 }
+.groupe span:last-child {
+    flex:1;
+}
+
 
 table{
     border: 2px solid black;
