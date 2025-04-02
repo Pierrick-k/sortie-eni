@@ -23,7 +23,7 @@ class Sortie
     private ?string $nom = null;
 
     #[ORM\Column]
-    #[Assert\GreaterThan('now')]
+    #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
     #[Assert\NotBlank(message:'La date et heure de début doit être renseigné')]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
@@ -35,7 +35,7 @@ class Sortie
 
     #[ORM\Column]
     #[Assert\NotBlank(message:'La date limite d\'inscription doit être renseignée')]
-    #[Assert\GreaterThan('now')]
+    #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
     #[ORM\Column]
