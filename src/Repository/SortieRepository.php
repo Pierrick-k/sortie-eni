@@ -22,6 +22,8 @@ class SortieRepository extends ServiceEntityRepository
         $queryBuilder->addSelect('l')
             ->leftJoin('s.lieu','l')
             ->addSelect('c')
+            ->leftJoin('l.ville', 'v')
+            ->addSelect('v')
             ->leftJoin('s.campus','c')
             ->where('s.id = :id');
         $queryBuilder->setParameter('id', $id);
