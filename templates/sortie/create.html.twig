@@ -19,30 +19,26 @@
     {{ form_row(sortieForm.campus) }}
     {{ form_row(sortieForm.lieu) }}
     <div class="groupe">
-            <div id="lieuInfos" hidden>
-                <div class="groupe">
-                    <span>Rue</span>
-                    <span id="lieuRue"></span>
-                </div>
-                <div class="groupe">
-                    <span>Code postal</span>
-                    <span id="lieuCp"></span>
-                </div>
-                <div class="groupe">
-                    <span>Latitude / Longitude</span>
-                    <span id="lieuCoord"></span>
-                </div>
+        <div id="lieuInfos" hidden>
+            <div class="groupe">
+                <span>Rue</span>
+                <span id="lieuRue"></span>
+            </div>
+            <div class="groupe">
+                <span>Code postal</span>
+                <span id="lieuCp"></span>
+            </div>
+            <div class="groupe">
+                <span>Latitude / Longitude</span>
+                <span id="lieuCoord"></span>
             </div>
         </div>
     </div>
     {{ form_row(sortieForm.infosSortie) }}
-
-
-
     <div>
         <button name="action" value="Enregistrer" class="btn btn-primary">Enregistrer</button>
         <button name="action" value="Publier" class="btn btn-success">Publier</button>
-        <a class="btn btn-secondary" href="{{ path('sortie_liste') }}">Retour à la liste</a>
+        <a class="btn btn-secondary" href="{{ path('sortie_list') }}">Retour à la liste</a>
     </div>
     {{ form_end(sortieForm) }}
     <script src="{{ asset('js/lieu.js') }}"></script>
