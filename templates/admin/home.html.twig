@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page d'administrateur | {{ parent() }}{% endblock %}
+
+{% block body %}
+    <h1>Page d'administrateur</h1>
+    <a class="btn btn-success" href="{{ path('admin_campus') }}">Gérer les campus</a>
+    <a class="btn btn-primary" href="{{ path('admin_cities') }}">Gérer les villes</a>
+    <a class="btn btn-warning" href="{{ path('admin_users') }}">Gérer les utilisateurs</a>
+{% endblock %}
