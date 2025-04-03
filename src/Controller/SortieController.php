@@ -60,7 +60,7 @@ final class SortieController extends AbstractController
         ]);
     }
 
-    #[Route('/update/{id}', name:'_update',methods:['GET','POST'])]
+    #[Route('/update/{id}', name:'_update', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
     public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, EtatRepository $etatRepository): Response{
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
@@ -79,12 +79,18 @@ final class SortieController extends AbstractController
             $this->addFlash('success', 'La sortie à bien été modifiée !');
             return $this->redirectToRoute('sortie_detail', ['id'=> $sortie->getId()]);
         }
-        return $this->render('sortie/create.html.twig',[
+        return $this->render('sortie/edit.html.twig',[
             'sortieForm' => $sortieForm,
         ]);
     }
 
-
+    #[Route('/delete/{id}', name:'_delete', requirements: ["id"=>"\d+"], methods:['GET','POST'])]
+    public function delete(Sortie $sortie, EntityManagerInterface $em): Response{
+        $em->remove($sortie);
+        $em->flush();
+        $this->addFlash('success', 'La sortie à bien été supprimée !');
+        return $this->redirectToRoute('sortie_list');
+    }
 
     #[Route('/list', name:'_list', methods: ['GET'])]
     public function list(SortieRepository $sortieRepository): Response{
