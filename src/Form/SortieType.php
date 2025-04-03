@@ -47,11 +47,6 @@ class SortieType extends AbstractType
                     'max'=>1440,
                 ]
             ])
-            ->add('campus', EntityType::class, [
-                'label'=>'Campus',
-                'class' => Campus::class,
-                'choice_label' => 'nom',
-            ])
             ->add('lieu', EntityType::class, [
                 'label'=>'Lieu',
                 'class' => Lieu::class,
