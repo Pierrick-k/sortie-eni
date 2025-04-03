@@ -41,9 +41,8 @@ final class SortieController extends AbstractController
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $action = $request->get('action');
             $updateEtat->updateEtat($action, $sortie);
-            //TODO: A enlever une fois connexion mise en place
-            $user = $userRepository->findOneBy(['email'=>'admin@eni.com']);
             $sortie->setOrganisateur($this->getUser());
+            $sortie->setCampus($this->getUser()->getCampus());
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été créée !');
