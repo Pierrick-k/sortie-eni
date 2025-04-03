@@ -5,10 +5,10 @@ namespace App\Controller;
 
 use App\Entity\Sortie;
 use App\Form\SortieType;
-use App\Repository\EtatRepository;
 use App\Form\FiltreSortieType;
 use App\Repository\SortieRepository;
 use App\Repository\UserRepository;
+use App\Util\UpdateEtat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,22 +31,14 @@ final class SortieController extends AbstractController
         ]);
     }
 
-
     #[Route('/create', name:'_create',methods:['GET','POST'])]
-    public function create(EntityManagerInterface $em, Request $request, EtatRepository $etatRepository, UserRepository $userRepository): Response{
+    public function create(EntityManagerInterface $em, Request $request, UserRepository $userRepository, UpdateEtat $updateEtat): Response{
         $sortie = new Sortie();
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $action = $request->get('action');
-            if($action === "Enregistrer"){
-                $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
-                $sortie->setEtat($etat);
-            }
-            if($action === "Publier"){
-                $etat = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
-                $sortie->setEtat($etat);
-            }
+            $updateEtat->updateEtat($action, $sortie);
             //TODO: A enlever une fois connexion mis en place
             $user = $userRepository->findOneBy(['email'=>'admin@eni.fr']);
             $sortie->setOrganisateur($user);
@@ -61,19 +53,12 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/update/{id}', name:'_update', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
-    public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, EtatRepository $etatRepository): Response{
+    public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, UpdateEtat $updateEtat): Response{
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
         if($sortieForm->isSubmitted() && $sortieForm->isValid()){
             $action = $request->get('action');
-            if($action === "Enregistrer"){
-                $etat = $etatRepository->findOneBy(['libelle' => 'En création']);
-                $sortie->setEtat($etat);
-            }
-            if($action === "Publier"){
-                $etat = $etatRepository->findOneBy(['libelle' => 'Ouverte']);
-                $sortie->setEtat($etat);
-            }
+            $updateEtat->updateEtat($action, $sortie);
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été modifiée !');
@@ -89,6 +74,19 @@ final class SortieController extends AbstractController
         $em->remove($sortie);
         $em->flush();
         $this->addFlash('success', 'La sortie à bien été supprimée !');
+        return $this->redirectToRoute('sortie_list');
+    }
+
+    #[Route('/publish/{id}', name:'_publish', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
+    public function publish(Sortie $sortie, UpdateEtat $updateEtat, EntityManagerInterface $em):Response{
+        if($sortie->getEtat()->getLibelle() === "En création"){
+            $action = "Publier";
+            $updateEtat->updateEtat($action, $sortie);
+            $em->persist($sortie);
+            $em->flush();
+            $this->addFlash('success', "La sortie à été publiée !");
+            return $this->redirectToRoute('sortie_detail', ['id'=> $sortie->getId()]);
+        }
         return $this->redirectToRoute('sortie_list');
     }
 
