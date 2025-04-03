@@ -53,6 +53,7 @@ class SortieType extends AbstractType
                 'label'=>'Lieu',
                 'class' => Lieu::class,
                 'choice_label' => 'nom',
+                "placeholder" => "--Choisissez un lieu--",
             ])
             ->add('infosSortie', TextAreaType::class,[
                 'label'=>'Description et infos',
