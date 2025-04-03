@@ -15,13 +15,4 @@ final class MainController extends AbstractController
             'controller_name' => 'MainController',
         ]);
     }
-
-    #[Route('/logout', name: 'app_logout')]
-    public function logout(): Response
-    {
-        return $this->render('main/logout.html.twig', [
-            'controller_name' => 'MainController',
-        ]);
-    }
-
 }

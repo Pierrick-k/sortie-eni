@@ -6,6 +6,7 @@ use App\Entity\Campus;
 use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Sortie;
+use App\Entity\User;
 use App\Entity\Ville;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -15,7 +16,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
 {
     public function getDependencies(): array
     {
-        return [LieuFixtures::class,CampusFixtures::class,EtatFixtures::class];
+        return [LieuFixtures::class, CampusFixtures::class, EtatFixtures::class, UserFixtures::class];
     }
 
     public function load(ObjectManager $manager): void
@@ -34,6 +35,13 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $sortie->setEtat($this->getReference('etat'.$faker->numberBetween(1,7),Etat::class));
             $sortie->setDateLimiteInscription(\DateTimeImmutable::createFromMutable($dateDebut));
             $sortie->setInfosSortie($faker->sentence(10));
+            $sortie->setOrganisateur($this->getReference('user'.$faker->numberBetween(0,14), User::class));
+            $nbParticipantACetteSortie = $faker->numberBetween(0,8);
+            for($pa=1; $pa <= $nbParticipantACetteSortie; $pa++) {
+                $participant = 'user'.$faker->numberBetween(0,14);
+                $sortie->addParticipant($this->getReference($participant, User::class));
+            }
+
             $manager->persist($sortie);
         }
         $manager->flush();

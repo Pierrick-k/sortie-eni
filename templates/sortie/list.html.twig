@@ -38,7 +38,11 @@
                     <td>{{ sortie.etat.libelle }}</td>
                     <td>{{ sortie.etat.libelle }}</td>
                     <td>{{ sortie.etat.libelle }}</td>
-                    <td>{{ sortie.infosSortie }}</td>
+                    <td>{{ sortie.infosSortie }}
+                        {% if sortie.etat.libelle == "En création" %}
+                            <a href="{{ path('sortie_publish',{id: sortie.id})}}">publier</a>
+                        {% endif %}
+                    </td>
                 </tr>
                 {%  endfor %}
             </tbody>

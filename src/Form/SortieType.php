@@ -9,6 +9,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -19,7 +20,9 @@ class SortieType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder
+        $builder->add('id', HiddenType::class, [
+            'mapped' => false,
+            ])
             ->add('nom',TextType::class,[
                 'label'=>'Nom de la sortie',
             ])
@@ -53,6 +56,7 @@ class SortieType extends AbstractType
                 'label'=>'Lieu',
                 'class' => Lieu::class,
                 'choice_label' => 'nom',
+                "placeholder" => "--Choisissez un lieu--",
             ])
             ->add('infosSortie', TextAreaType::class,[
                 'label'=>'Description et infos',
