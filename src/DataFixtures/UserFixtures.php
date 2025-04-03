@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Campus;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -15,6 +16,7 @@ class UserFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $faker= \Faker\Factory::create('fr_FR');
+        $campus = $manager->getRepository(Campus::class)->findAll();
 
         $admin = new User();
         $admin->setPrenom('Admin');
@@ -25,6 +27,8 @@ class UserFixtures extends Fixture
         $admin->setAdministrateur(true);
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setActif(false);
+        $admin->setCampus($faker->randomElement($campus));
+
         $manager->persist($admin);
 
 
@@ -33,12 +37,13 @@ class UserFixtures extends Fixture
             $prenom = $faker->firstName();
             $user->setPrenom($prenom);
             $user->setNom($faker->lastName());
-            $user->setTelephone($faker->phoneNumber());
+            $user->setTelephone('0123456789');
             $user->setEmail($faker->email());
             $user->setPassword($this->passwordHasher->hashPassword($user, $prenom));
             $user->setAdministrateur(false);
             $user->setRoles(['ROLE_USER']);
             $user->setActif(true);
+            $user->setCampus($faker->randomElement($campus));
             $manager->persist($user);
             $this->addReference( 'user' . $i, $user);
         }
