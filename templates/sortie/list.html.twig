@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{  parent() }} detail Sortie{% endblock %}
+{% block title %}Accueil | {{ parent() }}{% endblock %}
 {% block stylesheets %}
    {#  <link href="{{  asset('css/bootstrap-datepicker.css') }}" rel="stylesheet"/> #}
     <link rel="stylesheet" href="{{ asset('css/sortie.css') }}"
@@ -39,7 +39,7 @@
                     <td>{{ sortie.etat.libelle }}</td>
                     <td>{{ sortie.etat.libelle }}</td>
                     <td>{{ sortie.infosSortie }}
-                        {% if sortie.etat.libelle == "En création" %}
+                        {% if app.user and sortie.etat.libelle == "En création" and app.user.email|trim == sortie.organisateur.email|trim %}
                             <a href="{{ path('sortie_publish',{id: sortie.id})}}">publier</a>
                         {% endif %}
                     </td>
