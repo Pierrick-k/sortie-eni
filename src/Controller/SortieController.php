@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/sortie', name: 'sortie')]
 final class SortieController extends AbstractController
@@ -31,6 +32,7 @@ final class SortieController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/create', name:'_create',methods:['GET','POST'])]
     public function create(EntityManagerInterface $em, Request $request, UserRepository $userRepository, UpdateEtat $updateEtat): Response{
         $sortie = new Sortie();
@@ -41,7 +43,7 @@ final class SortieController extends AbstractController
             $updateEtat->updateEtat($action, $sortie);
             //TODO: A enlever une fois connexion mise en place
             $user = $userRepository->findOneBy(['email'=>'admin@eni.com']);
-            $sortie->setOrganisateur($user);
+            $sortie->setOrganisateur($this->getUser());
             $em->persist($sortie);
             $em->flush();
             $this->addFlash('success', 'La sortie à bien été créée !');
@@ -51,7 +53,7 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-
+    #[IsGranted('ROLE_USER')]
     #[Route('/update/{id}', name:'_update', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
     public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, UpdateEtat $updateEtat): Response{
         $sortieForm = $this->createForm(SortieType::class, $sortie);
@@ -68,7 +70,7 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-
+    #[IsGranted('ROLE_USER')]
     #[Route('/delete/{id}', name:'_delete', requirements: ["id"=>"\d+"], methods:['GET','POST'])]
     public function delete(Sortie $sortie, EntityManagerInterface $em): Response{
         $em->remove($sortie);
@@ -77,6 +79,7 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute('sortie_list');
     }
 
+    #[IsGranted('ROLE_USER')]
     #[Route('/publish/{id}', name:'_publish', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
     public function publish(Sortie $sortie, UpdateEtat $updateEtat, EntityManagerInterface $em):Response{
         if($sortie->getEtat()->getLibelle() === "En création"){
