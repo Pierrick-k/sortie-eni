@@ -12,8 +12,8 @@
             {# %  if app.user %#}
             {%  if true %}{#  todo: repasser en user controle #}
                 {%  if is_granted('ROLE_ADMIN') %}
-                    <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_main' %}active{% endif %}">
-                        <a class="nav-link" href="{{ path("app_main") }}">Administration</a>
+                    <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='admin_home' %}active{% endif %}">
+                        <a class="nav-link" href="{{ path("admin_home") }}">Administration</a>
                     </li>
                 {%  endif %}
                 <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='sortie_list' %}active{% endif %}">
