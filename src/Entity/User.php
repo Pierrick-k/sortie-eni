@@ -62,6 +62,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Sortie::class, mappedBy: 'participants')]
     private Collection $sortiesPart;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Campus $campus = null;
+
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
@@ -256,6 +260,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if ($this->sortiesPart->removeElement($sortiesPart)) {
             $sortiesPart->removeParticipant($this);
         }
+
+        return $this;
+    }
+
+    public function getCampus(): ?Campus
+    {
+        return $this->campus;
+    }
+
+    public function setCampus(?Campus $campus): static
+    {
+        $this->campus = $campus;
 
         return $this;
     }

@@ -15,6 +15,7 @@
             <div class="detail"><span class="name">Prénom:</span> <span class="value">{{ user.prenom }}</span></div>
             <div class="detail"><span class="name">Email:</span> <span class="value">{{ user.email }}</span></div>
             <div class="detail"><span class="name">Téléphone:</span> <span class="value">{{ user.telephone }}</span></div>
+            <a class="btn btn-primary" href="{{ path('user_update_profile') }}">Modifier</a>
         </div>
     </div>
 {% endblock %}
