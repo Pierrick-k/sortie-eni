@@ -1,0 +1,16 @@
+h1{
+    text-align: center;
+}
+
+table td{
+    width:33%;
+}
+
+.form-ligne {
+    display: flex;
+    gap: 1rem; /* espace entre les colonnes */
+    align-items: flex-end; /* pour que le bouton soit aligné au bas */
+}
+.colonne {
+    flex: 1; /* chaque colonne prend une part égale (ou adapte selon besoin) */
+}
