@@ -2,6 +2,53 @@
 
 {% block title %}Gerer les campus | {{ parent() }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Gérer les campus</h1>
+    <h1>Gérer les Campus</h1>
+    {{ form_start(searchForm, {'action': path('campus_list') }) }}
+    <legend>Filtrer les campus</legend>
+    {{ form_row(searchForm.nom) }}
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+    {{ form_end(searchForm) }}
+    <table>
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in campus %}
+            <tr>
+                <td>{{ c.nom }}</td>
+                <td>
+                    <a class="btn btn-warning" href="{{ path('campus_update', {id: c.id}) }}">Modifier</a>
+                    <a class="btn btn-danger" href="{{ path('campus_delete', {id: c.id}) }}">Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Aucun campus trouvé</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3">
+                {{ form_start(campusForm) }}
+                <div class="form-ligne">
+                    <div class="colonne">
+                        {{ form_widget(campusForm) }}
+                    </div>
+                    <div class="colonne">
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
+                </div>
+                {{ form_end(campusForm) }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 {% endblock %}

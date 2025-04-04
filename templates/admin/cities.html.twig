@@ -2,6 +2,58 @@
 
 {% block title %}Gerer les villes | {{ parent() }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+{% endblock %}
+
 {% block body %}
-    <h1>Gérer les villes</h1>
+    <h1>Gérer les Villes</h1>
+    {{ form_start(searchForm, {'action': path('user_list') }) }}
+    <legend>Filtrer les villes</legend>
+    {{ form_row(searchForm.nom) }}
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+    {{ form_end(searchForm) }}
+
+    <table>
+        <thead>
+        <tr>
+            <th>Ville</th>
+            <th>Code postal</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for city in cities %}
+            <tr>
+                <td>{{ city.nom }}</td>
+                <td>{{ city.codePostal }}</td>
+                <td>
+                    <a class="btn btn-warning" href="{{ path('ville_update', {id: city.id}) }}">Modifier</a>
+                    <a class="btn btn-danger" href="{{ path('ville_delete', {id: city.id}) }}">Supprimer</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">Aucune ville trouvée</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="3">
+                {{ form_start(villeForm) }}
+                <div class="form-ligne">
+                    <div class="colonne">
+                        {{ form_row(villeForm.nom) }}
+                    </div>
+                    <div class="colonne">
+                        {{ form_row(villeForm.codePostal) }}
+                    </div>
+                    <div class="colonne">
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                    </div>
+                </div>
+                {{ form_end(villeForm) }}
+            </td>
+        </tr>
+        </tbody>
+    </table>
 {% endblock %}

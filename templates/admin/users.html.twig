@@ -3,5 +3,38 @@
 {% block title %}Gerer les utilisateurs | {{ parent() }}{% endblock %}
 
 {% block body %}
-    <h1>Gérer les utilisateurs</h1>
+    <h1>Gérer les Utilisateurs</h1>
+    {{ form_start(searchForm, {'action': path('user_list') }) }}
+    <legend>Filtrer les utilisateurs</legend>
+    {{ form_row(searchForm.nom) }}
+    <button type="submit" class="btn btn-primary">Rechercher</button>
+    {{ form_end(searchForm) }}
+    <table>
+        <thead>
+        <tr>
+            <th>Email</th>
+            <th>Nom</th>
+            <th>Prenom</th>
+            <th>Actif</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.nom }}</td>
+                <td>{{ user.prenom }}</td>
+                <td>{{ user.actif ? 'Oui' : 'Non' }}</td>
+                <td>
+                    <a class="btn btn-warning" href="{{ path('user_update', {id: user.id}) }}">Modifier</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="2">Aucun utilisateur trouvé</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
