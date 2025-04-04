@@ -6,9 +6,13 @@ use App\Repository\VilleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use http\Message;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: VilleRepository::class)]
+#[UniqueEntity(fields: ['nom'], message: 'Cette ville existe déjà')]
 class Ville
 {
     #[ORM\Id]
@@ -17,9 +21,18 @@ class Ville
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'le champ du nom doit être renseigné')]
+    #[Assert\Length(min: 3,max: 255,
+        minMessage:'Le nom de la ville doit faire minimum 3 caracteres' ,
+        maxMessage: 'Le nom de la ville doit faire 255 caracteres maximum')]
     private ?string $nom = null;
 
     #[ORM\Column(length: 5)]
+    #[Assert\NotBlank(message: 'le champ du code postal doit être renseigné')]
+    #[Assert\Length(min:5,max:5, exactMessage: 'La valeur doit contenir exactement {{ limit }} caractères.')]
+    #[Assert\Type(type: 'numeric', message: 'Le code postal doit être un nombre.')]
+    #[Assert\GreaterThan(value: 10,
+        message: 'Le code postal doit être supérieur à 0' )]
     #[Groups(['getInfosLieu'])]
     private ?string $codePostal = null;
 
