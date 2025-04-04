@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Campus;
+use App\Form\CampusType;
+use App\Form\SearchFormType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +16,32 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user', name: 'user_')]
 final class UserController extends AbstractController
 {
+    #[Route('/list', name: 'list', methods: ['GET','POST'])]
+    public function list(UserRepository $userRepository, Request $request, EntityManagerInterface $em): Response
+    {
+        $email = $request->query->get('nom');
+        if ($email) {
+            $users = $userRepository->findByEmail($email);
+        } else {
+            $users = $userRepository->findAll();
+        }
+
+        $searchForm = $this->createForm(SearchFormType::class);
+        $searchForm->handleRequest($request);
+
+        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+            $data = $searchForm->getData();
+            return $this->redirectToRoute('user_list', [
+                'nom' => $data['nom'],
+            ]);
+        }
+
+        return $this->render('admin/users.html.twig', [
+            'users' => $users,
+            'searchForm' => $searchForm,
+        ]);
+    }
+
     #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'] ,methods: ['GET', 'POST'])]
     public function update($id, UserRepository $userRepository, EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher): Response
     {
