@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Ville;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -15,6 +16,16 @@ class VilleRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Ville::class);
     }
+
+    public function findByName(string $nom)
+        {
+            $queryBuilder= $this->createQueryBuilder('v')
+                ->andWhere('v.nom LIKE :nom');
+                $queryBuilder->setParameter('nom', '%'.$nom.'%');
+                $query = $queryBuilder->getQuery();
+                return $query->getResult();
+        }
+
 
     //    /**
     //     * @return Ville[] Returns an array of Ville objects
