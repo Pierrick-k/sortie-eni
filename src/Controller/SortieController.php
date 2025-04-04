@@ -101,4 +101,17 @@ final class SortieController extends AbstractController
             'FiltreSortie' => $FiltreSortie,
         ]);
     }
+    #[Route('/inscription/{id}', name:'_inscription', methods: ['GET','POST, PUT'])]
+    public function inscription(Sortie $sortie, EntityManagerInterface $em): Response{
+        $user = $this->getUser();
+        if ($sortie->getParticipants()->contains($user)) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie.');
+        } else {
+            $sortie->addParticipant($user);
+            $em->persist($sortie);
+            $em->flush();
+            $this->addFlash('success', 'Votre inscription à la sortie a été prise en compte.');
+        }
+        return $this->redirectToRoute('sortie_detail', ['id' => $sortie->getId()]);
+    }
 }

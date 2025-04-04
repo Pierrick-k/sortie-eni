@@ -42,6 +42,9 @@
                         {% if sortie.etat.libelle == "En création" %}
                             <a href="{{ path('sortie_publish',{id: sortie.id})}}">publier</a>
                         {% endif %}
+                        {% if sortie.etat.libelle == "Ouverte" %}
+                            <a href="{{ path('sortie_inscription',{id: sortie.id})}}">S'inscrire</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {%  endfor %}
