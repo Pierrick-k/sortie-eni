@@ -7,6 +7,7 @@ use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\File;
 
 class UserType extends AbstractType
 {
@@ -40,7 +42,22 @@ class UserType extends AbstractType
                 'mapped' => false,
                 'required' => false,
                 'label' => 'Confirmation',
-                    ]);
+                    ])
+        ->add('fichier',FileType::class,[
+        'label'=>'Image (JPG,PNG)',
+        'mapped'=>false,
+        'required'=>false,
+        'constraints' => [
+            new File([
+                'maxSize' => '1024k',
+                'mimeTypes' => [
+                    'image/jpeg',
+                    'image/png',
+                ],
+                'mimeTypesMessage' => 'Uploade uniquement des fichier PNG ou JPG',
+            ])
+        ]
+    ]);
         $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
             $form = $event->getForm();
             $newPassword = $form->get('newPassword')->getData();
