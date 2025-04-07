@@ -14,3 +14,16 @@ table td{
 .colonne {
     flex: 1; /* chaque colonne prend une part égale (ou adapte selon besoin) */
 }
+
+.divImage{
+    height:10em;
+    width:20%;
+}
+
+.divImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
