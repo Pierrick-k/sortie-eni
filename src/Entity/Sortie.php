@@ -241,4 +241,15 @@ class Sortie
 
         return $this;
     }
+
+    public function isParticipant(User $user): bool
+    {
+        foreach ($this->participants as $participant) {
+            if ($participant->getId() === $user->getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

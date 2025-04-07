@@ -34,16 +34,25 @@
                     <td>{{ sortie.nom }}</td>
                     <td>{{ sortie.dateHeureDebut|date("d/m/Y H:i") }}</td>
                     <td>{{ sortie.dateLimiteInscription|date("d/m/Y") }}</td>
-                    <td>{# { sortie.participants|length }}/{{ sortie.nbInscriptionMax }#}1/8</td>
+                    <td> {{ sortie.participants|length }}/{{ sortie.nbInscriptionMax }}</td>
                     <td>{{ sortie.etat.libelle }}</td>
+                    <td>
+                        {% if sortie.isParticipant(app.user) %}
+                            x
+                        {% endif %}
+                    </td>
                     <td>{{ sortie.etat.libelle }}</td>
-                    <td>{{ sortie.etat.libelle }}</td>
-                    <td>{{ sortie.infosSortie }}
+                    <td>
+                        <a href="{{ path('sortie_inscription',{id: sortie.id})}}">Afficher</a>
                         {% if sortie.etat.libelle == "En création" %}
                             <a href="{{ path('sortie_publish',{id: sortie.id})}}">publier</a>
                         {% endif %}
                         {% if sortie.etat.libelle == "Ouverte" %}
-                            <a href="{{ path('sortie_inscription',{id: sortie.id})}}">S'inscrire</a>
+                            {% if sortie.isParticipant(app.user)  %}
+                                <a href="{{ path('sortie_desinscription', {id: sortie.id}) }}">Se désister</a>
+                            {% elseif sortie.participants|length < sortie.nbInscriptionMax %}
+                                <a href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
