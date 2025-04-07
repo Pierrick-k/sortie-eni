@@ -10,11 +10,25 @@
     <div class="profile">
         <h2>Pseudo</h2>
         <div class="profile-details">
+            {% if user.fichier %}
+                <div class="detail">
+                    <div class="divImage">
+                        <img src="{{ asset('uploads/images/user/' ~ user.fichier) }}" alt="Image de profile">
+                    </div>
+                </div>
+            {% else %}
+                <div class="detail">
+                    <div class="divImage">
+                        <img src="{{ asset('images/user_defaut.jpg') }}" alt="Image de profile">
+                    </div>
+                </div>
+            {% endif %}
             <div class="detail"><span class="name">Campus:</span> <span class="value">{{ user.campus.nom }}</span></div>
             <div class="detail"><span class="name">Nom:</span> <span class="value">{{ user.nom }}</span></div>
             <div class="detail"><span class="name">Prénom:</span> <span class="value">{{ user.prenom }}</span></div>
             <div class="detail"><span class="name">Email:</span> <span class="value">{{ user.email }}</span></div>
-            <div class="detail"><span class="name">Téléphone:</span> <span class="value">{{ user.telephone }}</span></div>
+            <div class="detail"><span class="name">Téléphone:</span> <span class="value">{{ user.telephone }}</span>
+            </div>
             <a class="btn btn-primary" href="{{ path('user_update_profile') }}">Modifier</a>
         </div>
     </div>

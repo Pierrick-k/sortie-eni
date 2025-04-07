@@ -2,20 +2,24 @@
 
 namespace App\Controller;
 
-use App\Entity\Campus;
-use App\Form\CampusType;
 use App\Form\SearchFormType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 #[Route('/user', name: 'user_')]
 final class UserController extends AbstractController
 {
+    #[IsGranted('ROLE_ADMIN')]
     #[Route('/list', name: 'list', methods: ['GET','POST'])]
     public function list(UserRepository $userRepository, Request $request, EntityManagerInterface $em): Response
     {
@@ -43,7 +47,12 @@ final class UserController extends AbstractController
     }
 
     #[Route('/update/{id}', name: 'update', requirements: ['id' => '\d+'] ,methods: ['GET', 'POST'])]
-    public function update($id, UserRepository $userRepository, EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function update($id, UserRepository $userRepository,
+                           EntityManagerInterface $em,
+                           Request $request,
+                           UserPasswordHasherInterface $passwordHasher,
+                           #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
+                           SluggerInterface $slugger): Response
     {
         $user = $userRepository->find($id);
         if (!$user) {
@@ -56,6 +65,25 @@ final class UserController extends AbstractController
             if ($newPassword) {
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
+            }
+            $fichier = $userForm->get('fichier')->getData();
+            if($fichier){
+                $filePath=$fichierDirectory . '/' . $user->getFichier();
+                if($user->getFichier() != null){
+                    unlink($filePath);
+                }
+                $user->setFichier(null);
+
+                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
+
+                try {
+                    $fichier->move($fichierDirectory, $newFilename);
+                    $user->setFichier($newFilename);
+                } catch (FileException $e) {
+                    dd($e->getMessage());
+                }
             }
             $em->persist($user);
             $em->flush();
@@ -84,7 +112,11 @@ public function detail($id, UserRepository $userRepository): Response{
     }
 
     #[Route('/update/profile', name: 'update_profile', methods: ['GET', 'POST'])]
-    public function updateProfile( EntityManagerInterface $em, Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function updateProfile( EntityManagerInterface $em,
+                                   Request $request,
+                                   UserPasswordHasherInterface $passwordHasher,
+                                   #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
+                                   SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
         if (!$user) {
@@ -98,6 +130,26 @@ public function detail($id, UserRepository $userRepository): Response{
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
             }
+            $fichier = $userForm->get('fichier')->getData();
+            if($fichier){
+                $filePath=$fichierDirectory . '/' . $user->getFichier();
+                if($user->getFichier() != null){
+                    unlink($filePath);
+                }
+                $user->setFichier(null);
+
+                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
+
+                try {
+                    $fichier->move($fichierDirectory, $newFilename);
+                    $user->setFichier($newFilename);
+                } catch (FileException $e) {
+                    dd($e->getMessage());
+                }
+            }
+
             $em->persist($user);
             $em->flush();
             $this->addFlash('success', 'Profile updated successfully.');

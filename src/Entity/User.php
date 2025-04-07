@@ -66,6 +66,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Campus $campus = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\File(
+        maxSize: '1024k',
+        mimeTypes: ['image/jpeg', 'image/png'],
+        mimeTypesMessage: 'Uploade uniquement des fichiers PNG ou JPG.',
+    )]
+    private ?string $fichier = null;
+
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
@@ -272,6 +280,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setCampus(?Campus $campus): static
     {
         $this->campus = $campus;
+
+        return $this;
+    }
+
+    public function getFichier(): ?string
+    {
+        return $this->fichier;
+    }
+
+    public function setFichier(?string $fichier): static
+    {
+        $this->fichier = $fichier;
 
         return $this;
     }

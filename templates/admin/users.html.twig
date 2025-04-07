@@ -2,6 +2,10 @@
 
 {% block title %}Gerer les utilisateurs | {{ parent() }}{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+{% endblock %}
+
 {% block body %}
     <h1>Gérer les Utilisateurs</h1>
     {{ form_start(searchForm, {'action': path('user_list') }) }}
@@ -22,6 +26,11 @@
         <tbody>
         {% for user in users %}
             <tr>
+                {% if user.fichier %}
+                <td class="divImage"><img class='userImg' src="{{ asset('uploads/images/user/' ~ user.fichier) }}" alt="Image de profile"></td>
+                {% else %}
+                    <td class="divImage"><img class='userImg' src="{{ asset('images/user_defaut.jpg') }}" alt="Image de profile"></td>
+                     {% endif %}
                 <td>{{ user.email }}</td>
                 <td>{{ user.nom }}</td>
                 <td>{{ user.prenom }}</td>
