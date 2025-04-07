@@ -95,12 +95,38 @@ final class SortieController extends AbstractController
     #[Route('/list', name:'_list', methods: ['GET'])]
     public function list(SortieRepository $sortieRepository): Response{
         $sorties = $sortieRepository->findAll();
-
         $FiltreSortie = $this->createForm(FiltreSortieType::class);
 
         return $this->render('sortie/list.html.twig', [
             'sorties' => $sorties,
             'FiltreSortie' => $FiltreSortie,
         ]);
+    }
+    #[Route('/inscription/{id}', name:'_inscription', methods: ['GET','POST, PUT'])]
+    public function inscription(Sortie $sortie, EntityManagerInterface $em): Response{
+        $user = $this->getUser();
+        if ($sortie->getParticipants()->contains($user)) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cette sortie.');
+        } else {
+            $sortie->addParticipant($user);
+            $em->persist($sortie);
+            $em->flush();
+            $this->addFlash('success', 'Votre inscription à la sortie a été prise en compte.');
+        }
+        return $this->redirectToRoute('sortie_detail', ['id' => $sortie->getId()]);
+    }
+    #[Route('/desinscription/{id}', name:'_desinscription', methods: ['delete', 'GET'])]
+    public  function desinscription(Sortie $sortie, EntityManagerInterface $em): Response{
+        $user = $this->getUser();
+        if ($sortie->getParticipants()->contains($user)) {
+            $sortie->removeParticipant($user);
+            $em->persist($sortie);
+            $em->flush();
+            $this->addFlash('success', 'Vous êtes desinscrit');
+        } else {
+            $this->addFlash('warning', 'Vous n\'êtes déjà pas inscrit à cette sortie');
+        }
+        return $this->redirectToRoute('sortie_detail', ['id' => $sortie->getId()]);
+
     }
 }
