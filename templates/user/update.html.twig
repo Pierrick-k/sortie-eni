@@ -2,9 +2,18 @@
 
 {% block title %}Profile{% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/user.css') }}">
+{% endblock %}
+
 {% block body %}
     <h2>Update Profile</h2>
     {{ form_start(userForm) }}
+    {% if user.fichier %}
+        <div class="divImage">
+            <img src="{{ asset('uploads/images/user/' ~ user.fichier) }}" alt="Image de profile">
+        </div>
+    {% endif %}
     {{ form_widget(userForm) }}
     <button class="btn btn-primary">Modifier</button>
     {{ form_end(userForm) }}
