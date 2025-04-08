@@ -10,13 +10,11 @@ use App\Util\ManagerFile;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[IsGranted('ROLE_USER')]
 #[Route('/user', name: 'user_')]
@@ -109,6 +107,7 @@ final class UserController extends AbstractController
         }
         return $this->render('user/detail.html.twig', ["user" => $user]);
     }
+    /*
     #[Route('/profile', name: 'profile', methods: ['GET'])]
     public function profile(): Response{
         $user = $this->getUser();
@@ -163,4 +162,5 @@ final class UserController extends AbstractController
             'user'=>$user,
         ]);
     }
+*/
 }

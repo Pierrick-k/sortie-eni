@@ -25,3 +25,7 @@ footer {
     border-radius: 0 0 13px 13px;
 }
 
+.medaillon {
+    left: 75% !important;
+    bottom: -35% !important;
+}
