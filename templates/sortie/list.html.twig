@@ -91,11 +91,15 @@
                                 <a href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
                             {% endif %}
                         {% endif %}
-                        {% if sortie.estModifiable() %}
+{#                        {% if sortie.estModifiable() %}#}
                             <a href="">Modifier</a>
-                        {% endif %}
-                        <a href="">Supprimer</a>
-                        <a href="">Annuler</a>
+{#                        {% endif %}#}
+{#                        {% if sortie.estSupprimable() %}#}
+                            <a href="">Supprimer</a>
+{#                        {% endif %}#}
+{#                        {% if sortie.estAnnulable() %}#}
+                            <a href="">Annuler</a>
+{#                        {% endif %}#}
                     </td>
                 </tr>
                 {%  endfor %}
