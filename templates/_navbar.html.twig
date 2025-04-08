@@ -9,8 +9,7 @@
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <ul class="navbar-nav me-5">
             {% set currentPath = app.request.attributes.get('_route') %}
-            {# %  if app.user %#}
-            {%  if true %}{#  todo: repasser en user controle #}
+            {%  if app.user %}
                 {%  if is_granted('ROLE_ADMIN') %}
                     <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='admin_home' %}active{% endif %}">
                         <a class="nav-link" href="{{ path("admin_home") }}">Administration</a>
@@ -19,12 +18,12 @@
                 <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='sortie_list' %}active{% endif %}">
                     <a class="nav-link" href="{{ path("sortie_list") }}">Accueil</a>
                 </li>
-                {%  if app.user %}
+
                     <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='sortie_create' %}active{% endif %}">
                     <a class="nav-link" href="{{ path("sortie_create") }}">Créer une sortie</a>
                 </li>
                     <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='user_detail' %}active{% endif %}">
-                    <a class="nav-link" href="{{ path("user_profile")}}">Mon Profil</a>
+                    <a class="nav-link" href="{{ path("user_detail",{id:app.user.id})}}">Mon Profil</a>
                 </li>
                 <li class="nav-item btn btn-light btn-sm mx-2 {% if currentPath=='app_logout' %}active{% endif %}">
                     <a class="nav-link" href="{{ path("app_logout") }}">Se déconnecter</a>
@@ -34,7 +33,6 @@
                         <a class="nav-link" href="{{ path("app_login") }}">Se connecter</a>
                     </li>
             {% endif %}
-            {%  endif %}
         </ul>
     </div>
 </nav>
