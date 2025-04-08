@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\SearchFormType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -58,7 +59,9 @@ final class UserController extends AbstractController
         if (!$user) {
             throw $this->createNotFoundException();
         }
-        $userForm = $this->createForm(UserType::class, $user);
+        $userForm = $this->createForm(UserType::class, $user,  [
+            'is_edit' => true,
+        ]);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $newPassword = $userForm->get('newPassword')->getData();
@@ -95,7 +98,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/detail/{id}', name: 'detail', requirements: ['id' => '\d+'], methods: ['GET'])]
-public function detail($id, UserRepository $userRepository): Response{
+    public function detail($id, UserRepository $userRepository): Response{
         $user = $userRepository->find($id);
         if (!$user) {
             throw $this->createNotFoundException();
@@ -158,6 +161,57 @@ public function detail($id, UserRepository $userRepository): Response{
             'userForm' => $userForm,
         ]);
     }
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+    public function create(UserRepository $userRepository,
+                           EntityManagerInterface $em,
+                           Request $request,
+                           UserPasswordHasherInterface $passwordHasher,
+                           #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
+                           SluggerInterface $slugger
+    ): Response
+    {
+        $user = new User();
+        $userForm = $this->createForm(UserType::class, $user,  [
+            'is_edit' => false,
+        ]);
+        $userForm->handleRequest($request);
+        if ($userForm->isSubmitted() && $userForm->isValid()) {
+            $user->setRoles(['ROLE_USER']);
+            $user->setActif(true);
+            $user->setAdministrateur(false);
+            $newPassword = $userForm->get('newPassword')->getData();
+            if ($newPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+                $user->setPassword($hashedPassword);
+            }
+            $fichier = $userForm->get('fichier')->getData();
+            if($fichier){
+                $filePath=$fichierDirectory . '/' . $user->getFichier();
+                if($user->getFichier() != null){
+                    unlink($filePath);
+                }
+                $user->setFichier(null);
 
+                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
+
+                try {
+                    $fichier->move($fichierDirectory, $newFilename);
+                    $user->setFichier($newFilename);
+                } catch (FileException $e) {
+                    dd($e->getMessage());
+                }
+            }
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', 'User added successfully.');
+            return $this->redirectToRoute('user_list');
+        }
+        return $this->render('user/create.html.twig', [
+            'userForm' => $userForm,
+        ]);
+    }
 
 }
