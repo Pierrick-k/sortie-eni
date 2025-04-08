@@ -80,7 +80,7 @@
                     </td>
 
                     <td>
-                        <a href="{{ path('sortie_inscription',{id: sortie.id})}}">Afficher</a>
+                        <a href="{{ path('sortie_detail',{id: sortie.id})}}">Afficher</a>
                         {% if sortie.etat.libelle == sortie.etat.EN_CREATION %}
                             <a href="{{ path('sortie_publish',{id: sortie.id})}}">Publier</a>
                         {% endif %}
