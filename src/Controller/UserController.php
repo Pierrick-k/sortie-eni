@@ -159,5 +159,4 @@ public function detail($id, UserRepository $userRepository): Response{
         ]);
     }
 
-
 }

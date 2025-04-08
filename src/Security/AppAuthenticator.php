@@ -22,6 +22,8 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
 
     public const LOGIN_ROUTE = 'app_login';
 
+    public const DEFAULT_ROUTE = 'sortie_list';
+
     public function __construct(private UrlGeneratorInterface $urlGenerator)
     {
     }
@@ -48,7 +50,7 @@ class AppAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-         return new RedirectResponse($this->urlGenerator->generate('sortie_create'));
+         return new RedirectResponse($this->urlGenerator->generate(self::DEFAULT_ROUTE));
     }
 
     protected function getLoginUrl(Request $request): string

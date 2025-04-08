@@ -29,7 +29,6 @@ h1{
     flex:1;
 }
 
-
 table{
     border: 2px solid black;
     border-collapse: collapse;
@@ -48,5 +47,18 @@ td{
     border-left: 2px solid black;
 }
 
+.fltrCol {
+    display: inline-block;
+}
 
+.w-49 {
+    width: 49%;
+}
 
+.w-7rem {
+    width: 7rem !important;
+}
+
+.table {
+    font-size: 0.8rem;
+}
