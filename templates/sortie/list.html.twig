@@ -94,8 +94,12 @@
                         {% if sortie.estModifiable() %}
                             <a href="">Modifier</a>
                         {% endif %}
-                        <a href="">Supprimer</a>
-                        <a href="">Annuler</a>
+                        {% if sortie.estSupprimable() %}
+                            <a href="">Supprimer</a>
+                        {% endif %}
+                        {% if sortie.estAnnulable() %}
+                            <a href="">Annuler</a>
+                        {% endif %}
                     </td>
                 </tr>
                 {%  endfor %}

@@ -276,4 +276,41 @@ class Sortie
         return false;
     }
 
+    public function estSupprimable():bool
+    {
+        dump($this->etat);
+        if (in_array($this->etat,
+            [
+                etat::EN_CREATION,
+                etat::OUVERTE,
+                etat::ANNULEE,
+                etat::EN_COURS
+            ])
+//            && $this->organisateur == getCurrentUser()
+//            || $this->isGranted('ROLE_ADMIN')
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function estAnnulable():bool
+    {
+
+        dump($this->etat);
+        if (in_array($this->etat,
+            [
+                etat::EN_CREATION,
+                etat::OUVERTE,
+                etat::ANNULEE,
+                etat::EN_COURS
+            ])
+//            && $this->organisateur == getCurrentUser()
+//            || $this->isGranted('ROLE_ADMIN')
+        ) {
+            return true;
+        }
+        return false;
+    }
+
 }
