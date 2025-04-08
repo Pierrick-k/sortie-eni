@@ -62,7 +62,9 @@ final class UserController extends AbstractController
         if (!$user instanceof User) {
             throw new \LogicException('Erreur: L\'utilsateur n\'est pas une instance de: User.');
         }
-        $userForm = $this->createForm(UserType::class, $user);
+        $userForm = $this->createForm(UserType::class, $user, [
+            'disabled_campus' => !in_array('ROLE_ADMIN', $this->getUser()->getRoles()),
+        ]);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
             $newPassword = $userForm->get('newPassword')->getData();
@@ -101,9 +103,6 @@ final class UserController extends AbstractController
         $user = $userRepository->find($id);
         if (!$user) {
             throw $this->createNotFoundException();
-        }
-        if($this->getUser()->getId() != $user->getId() && !in_array('ROLE_ADMIN', $this->getUser()->getRoles())){
-            return $this->render('user/detail.html.twig', ["user" => $this->getUser()]);
         }
         return $this->render('user/detail.html.twig', ["user" => $user]);
     }

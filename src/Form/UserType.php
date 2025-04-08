@@ -6,6 +6,7 @@ use App\Entity\Campus;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -15,19 +16,44 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\File;
 
 class UserType extends AbstractType
 {
+
+    public function __construct(private Security $security)
+    {
+    }
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $user= $event->getData();
+            $form= $event->getForm();
+
+            if($user && $user->getFichier()){
+                $form->add('deleteImg', CheckBoxType::class, [
+                    'mapped' => false,
+                    'label'=> 'Supprimer l\'image',
+                    'required' => false,
+                ]);
+            }
+
+            $userConnected= $this->security->getUser();
+            if(in_array('ROLE_ADMIN', $userConnected->getRoles())){
+                $form->add('actif', CheckboxType::class, [
+                    'label' => 'Utilisateur actif',
+                    'required' => false,
+                ]);
+            }
+        });
+
         $builder
             ->add('campus', EntityType::class, [
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'nom',
-                'disabled' => true,
-                'mapped' => false,
+                'disabled' => $options['disabled_campus'],
             ])
             ->add('email', EmailType::class)
             ->add('nom', TextType::class)
@@ -73,6 +99,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'disabled_campus' => true,
         ]);
     }
 }
