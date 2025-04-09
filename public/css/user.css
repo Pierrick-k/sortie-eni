@@ -1,3 +1,7 @@
+h2{
+    text-align: center;
+}
+
 .profile {
     display: flex;
     flex-direction: column;

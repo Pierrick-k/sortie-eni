@@ -295,4 +295,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getPseudo():string
+    {
+        return $this->nom.' '.substr($this->prenom,0,1).'.';
+    }
 }

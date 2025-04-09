@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\SearchFormType;
 use App\Form\UserType;
 use App\Repository\UserRepository;
+use App\Util\ManagerFile;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -53,14 +54,17 @@ final class UserController extends AbstractController
                            Request $request,
                            UserPasswordHasherInterface $passwordHasher,
                            #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
-                           SluggerInterface $slugger): Response
+                           ManagerFile $managerFile): Response
     {
         $user = $userRepository->find($id);
         if (!$user) {
             throw $this->createNotFoundException();
         }
-        $userForm = $this->createForm(UserType::class, $user,  [
-            'is_edit' => true,
+        if (!$user instanceof User) {
+            throw new \LogicException('Erreur: L\'utilsateur n\'est pas une instance de: User.');
+        }
+        $userForm = $this->createForm(UserType::class, $user, [
+            'is_edit' => false,
         ]);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
@@ -69,31 +73,29 @@ final class UserController extends AbstractController
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
             }
+            if($userForm->has('deleteImg')){
+                if ($userForm->get('deleteImg')->getData()) {
+                    if ($user->getFichier()) {
+                        $managerFile->delete($user->getFichier(), $fichierDirectory);
+                    }
+                    $user->setFichier(null);
+                }
+            }
             $fichier = $userForm->get('fichier')->getData();
             if($fichier){
-                $filePath=$fichierDirectory . '/' . $user->getFichier();
-                if($user->getFichier() != null){
-                    unlink($filePath);
-                }
-                $user->setFichier(null);
-
-                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
-
-                try {
-                    $fichier->move($fichierDirectory, $newFilename);
-                    $user->setFichier($newFilename);
-                } catch (FileException $e) {
-                    dd($e->getMessage());
-                }
+                $managerFile->upload($fichier, $fichierDirectory, $user);
             }
             $em->persist($user);
             $em->flush();
             $this->addFlash('success', 'Profile updated successfully.');
+            return $this->redirectToRoute('user_detail', ['id' => $user->getId()]);
+        }
+        if($this->getUser()->getId() != $user->getId() && !in_array('ROLE_ADMIN', $this->getUser()->getRoles())){
+            return $this->render('user/detail.html.twig', ["user" => $this->getUser()]);
         }
         return $this->render('user/update.html.twig', [
             'userForm' => $userForm,
+            'user'=>$user,
         ]);
     }
 

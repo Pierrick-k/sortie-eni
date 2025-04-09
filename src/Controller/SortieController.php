@@ -4,6 +4,7 @@ namespace App\Controller;
 
 
 use App\Entity\Sortie;
+use App\Form\Model\FiltreSortieModel;
 use App\Form\SortieType;
 use App\Form\FiltreSortieType;
 use App\Repository\SortieRepository;
@@ -93,9 +94,19 @@ final class SortieController extends AbstractController
     }
 
     #[Route('/list', name:'_list', methods: ['GET'])]
-    public function list(SortieRepository $sortieRepository): Response{
-        $sorties = $sortieRepository->findAll();
-        $FiltreSortie = $this->createForm(FiltreSortieType::class);
+    public function list(SortieRepository $sortieRepository, EntityManagerInterface $em, Request $request): Response{
+        $filtreSortieModel = new FiltreSortieModel();
+        $FiltreSortie = $this->createForm(FiltreSortieType::class, $filtreSortieModel);
+        $FiltreSortie->handleRequest($request);
+
+        if( $FiltreSortie->isSubmitted()) :
+            $sorties = $sortieRepository->findSortieByFilter($filtreSortieModel, $this->getUser());
+//            $this->addFlash('success', 'des résultats trouvés');
+        else:
+//            $this->addFlash('success', 'On passe ici aussi');
+            $sorties = $sortieRepository->findAll();
+        endif;
+        dump($sorties);
 
         return $this->render('sortie/list.html.twig', [
             'sorties' => $sorties,

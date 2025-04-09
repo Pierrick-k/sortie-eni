@@ -29,7 +29,9 @@
             <div class="detail"><span class="name">Email:</span> <span class="value">{{ user.email }}</span></div>
             <div class="detail"><span class="name">Téléphone:</span> <span class="value">{{ user.telephone }}</span>
             </div>
-            <a class="btn btn-primary" href="{{ path('user_update_profile') }}">Modifier</a>
+            {% if app.user.id == user.id or is_granted('ROLE_ADMIN') %}
+            <a class="btn btn-primary" href="{{ path('user_update',{id: user.id}) }}">Modifier</a>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -6,6 +6,7 @@ use App\Repository\SortieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -241,12 +242,73 @@ class Sortie
         return $this;
     }
 
-    public function isParticipant(User $user): bool
+    public function isParticipant(?User $user): bool
     {
+        /*if (empty($user)){
+            return false;
+        }
         foreach ($this->participants as $participant) {
             if ($participant->getId() === $user->getId()) {
                 return true;
             }
+        }
+        return false;*/
+
+        return $this->participants->contains($user);
+    }
+
+    public function estModifiable():bool
+    {
+
+        dump($this->etat);
+        if (in_array($this->etat,
+            [
+                etat::EN_CREATION,
+                etat::OUVERTE,
+                etat::ANNULEE,
+                etat::EN_COURS
+            ])
+//            && $this->organisateur == getCurrentUser()
+//            || $this->isGranted('ROLE_ADMIN')
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function estSupprimable():bool
+    {
+        dump($this->etat);
+        if (in_array($this->etat,
+            [
+                etat::EN_CREATION,
+                etat::OUVERTE,
+                etat::ANNULEE,
+                etat::EN_COURS
+            ])
+//            && $this->organisateur == getCurrentUser()
+//            || $this->isGranted('ROLE_ADMIN')
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function estAnnulable():bool
+    {
+
+        dump($this->etat);
+        if (in_array($this->etat,
+            [
+                etat::EN_CREATION,
+                etat::OUVERTE,
+                etat::ANNULEE,
+                etat::EN_COURS
+            ])
+//            && $this->organisateur == getCurrentUser()
+//            || $this->isGranted('ROLE_ADMIN')
+        ) {
+            return true;
         }
         return false;
     }
