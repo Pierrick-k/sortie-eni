@@ -215,5 +215,24 @@ final class UserController extends AbstractController
             'userForm' => $userForm,
         ]);
     }
-
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/delete/{id}', name: 'delete', requirements: ["id"=>"\d+"], methods:["GET","POST"])]
+    public function deleteUser($id, EntityManagerInterface $em , UserRepository $userRepository): Response {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException();
+        }
+        if ($user->getSortiesPart()->count() > 0) {
+            $this->addFlash('danger', 'Impossible de supprimer un utilisateur inscrit à des sorties.');
+            return $this->redirectToRoute('user_list');
+        }
+        if ($user->getSorties()->count() > 0) {
+            $this->addFlash('danger', 'Impossible de supprimer un utilisateur qui organise une sortie.');
+            return $this->redirectToRoute('user_list');
+        }
+        $em->remove($user);
+        $em->flush();
+        $this->addFlash('success', 'User deleted successfully.');
+        return $this->redirectToRoute('user_list');
+    }
 }
