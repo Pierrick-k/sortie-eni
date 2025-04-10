@@ -157,6 +157,13 @@ class Sortie
         return $this;
     }
 
+    public function appendInfosSortie(?string $infosSortie): static
+    {
+        $this->infosSortie = '[MOTIF D\'ANNULATION] : ' .$infosSortie. ' | ' . $this->infosSortie;
+
+        return $this;
+    }
+
     public function getEtat(): ?Etat
     {
         return $this->etat;
@@ -244,73 +251,7 @@ class Sortie
 
     public function isParticipant(?User $user): bool
     {
-        /*if (empty($user)){
-            return false;
-        }
-        foreach ($this->participants as $participant) {
-            if ($participant->getId() === $user->getId()) {
-                return true;
-            }
-        }
-        return false;*/
-
         return $this->participants->contains($user);
-    }
-
-    public function estModifiable():bool
-    {
-
-        dump($this->etat);
-        if (in_array($this->etat,
-            [
-                etat::EN_CREATION,
-                etat::OUVERTE,
-                etat::ANNULEE,
-                etat::EN_COURS
-            ])
-//            && $this->organisateur == getCurrentUser()
-//            || $this->isGranted('ROLE_ADMIN')
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    public function estSupprimable():bool
-    {
-        dump($this->etat);
-        if (in_array($this->etat,
-            [
-                etat::EN_CREATION,
-                etat::OUVERTE,
-                etat::ANNULEE,
-                etat::EN_COURS
-            ])
-//            && $this->organisateur == getCurrentUser()
-//            || $this->isGranted('ROLE_ADMIN')
-        ) {
-            return true;
-        }
-        return false;
-    }
-
-    public function estAnnulable():bool
-    {
-
-        dump($this->etat);
-        if (in_array($this->etat,
-            [
-                etat::EN_CREATION,
-                etat::OUVERTE,
-                etat::ANNULEE,
-                etat::EN_COURS
-            ])
-//            && $this->organisateur == getCurrentUser()
-//            || $this->isGranted('ROLE_ADMIN')
-        ) {
-            return true;
-        }
-        return false;
     }
 
 }

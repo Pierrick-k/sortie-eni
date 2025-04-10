@@ -62,3 +62,7 @@ td{
 .table {
     font-size: 0.8rem;
 }
+
+.actionBtn a {
+    font-size: xx-small;
+}

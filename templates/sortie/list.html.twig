@@ -79,41 +79,121 @@
                         {%  endif %}
                     </td>
 
-                    <td>
-                        <a href="{{ path('sortie_detail',{id: sortie.id})}}">Afficher</a>
+                    <td class="actionBtn">
+                        <a class="btn btn-sm btn-secondary" href="{{ path('sortie_detail',{id: sortie.id}) }}">Afficher</a>
                         {% if sortie.etat.libelle == sortie.etat.EN_CREATION %}
-                            <a href="{{ path('sortie_publish',{id: sortie.id})}}">Publier</a>
+                            <a class="btn btn-sm btn-secondary" href="{{ path('sortie_publish',{id: sortie.id})}}">Publier</a>
                         {% endif %}
                         {% if sortie.etat.libelle == sortie.etat.OUVERTE %}
                             {% if sortie.isParticipant(app.user)  %}
-                                <a href="{{ path('sortie_desinscription', {id: sortie.id}) }}">Se désister</a>
+                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_desinscription', {id: sortie.id}) }}">Se désister</a>
                             {% elseif sortie.participants|length < sortie.nbInscriptionMax %}
-                                <a href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
+                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
                             {% endif %}
                         {% endif %}
-{#                        {% if sortie.estModifiable() %}#}
-                            <a href="">Modifier</a>
-{#                        {% endif %}#}
-{#                        {% if sortie.estSupprimable() %}#}
-                            <a href="">Supprimer</a>
-{#                        {% endif %}#}
-{#                        {% if sortie.estAnnulable() %}#}
-                            <a href="">Annuler</a>
-{#                        {% endif %}#}
+                        {%  if  sortie.etat.libelle in [sortie.etat.EN_CREATION, sortie.etat.OUVERTE, sortie.etat.ANNULEE, sortie.etat.EN_COURS] %}
+                            {%  if (app.user.id == sortie.organisateur.id or is_granted('ROLE_ADMIN') ) %}
+                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_update', {id: sortie.id}) }}">Modifier</a>
+                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_delete', {id: sortie.id}) }}">Supprimer</a>
+                                {%  if sortie.etat.libelle != sortie.etat.ANNULEE %}
+                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#cancelModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_annulation', {id: sortie.id}) }}">Annuler</a>
+                                {%  endif %}
+                            {%  endif %}
+                        {%  endif %}
                     </td>
                 </tr>
                 {%  endfor %}
             </tbody>
         </table>
     </div>
-    {#
+{% endblock %}
+
+{%  block popup %}
+    <div class="modal fade customModal" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="deleteModalLabel">Suppression de la sortie :</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="#" method="post">
+                        <div class="mb-3">
+                            Êtes-vous sur de vouloir la suppression de la sortie?
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary submit-button">Confirmer la suppression</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade customModal" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="cancelModalLabel"><span class="fw-bold">Annulation de la sortie :</span></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="#" method="post">
+                        <div class="mb-3">
+                            <label for="motif-annulation" class="col-form-label">Motif de l'annulation :</label>
+                            <textarea class="form-control" id="motif-annulation" name="motif-annulation"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abandonner</button>
+                    <button type="submit" class="btn btn-primary submit-button">Confirmer l'annulation</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.getElementsByClassName('js-datepicker').datepicker({
-            format: "dd-mm-yyyy",
-            language: "fr",
-            multidate: false,
-            todayHighlight: true
-        });
-</script>
-    #}
+        if (typeof(targetModalList) == 'undefined') {
+            var targetModalList = document.getElementsByClassName('customModal');
+        } else {
+            targetModalList = document.getElementsByClassName('customModal');
+        }
+        for(let target in targetModalList) {
+            let targetModal = targetModalList.item(parseInt(target));
+            targetModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+
+                const sortieNom = button.getAttribute('data-bs-libelle');
+                const action = button.getAttribute('data-bs-action');
+
+                let modalTitle = targetModal.querySelector('.modal-title');
+                let modalBodyInput = targetModal.querySelector('.modal-body form');
+
+                modalTitle.append(` ${sortieNom}`);
+                modalBodyInput.action = action;
+
+                let mySubmit = function() {
+                    let myModalForm = targetModal.getElementsByTagName('form');
+                    myModalForm.item(0).submit();
+                }
+                let unMotif = document.querySelector('#' + targetModal.id + ' #motif-annulation');
+                if (unMotif) {
+                    unMotif.focus();
+                    mySubmit = function() {
+                        let myModalForm = targetModal.getElementsByTagName('form');
+                        if (document.getElementById('motif-annulation').textLength <= 0) {
+                            alert('Le motif est indispensable!');
+                        } else {
+                            // console.log('mon formulaire', myModalForm.item(0));
+                            myModalForm.item(0).submit();
+                        }
+                    }
+                }
+                let validButton = targetModal.getElementsByClassName('submit-button');
+                validButton.item(0).addEventListener('click', mySubmit);
+            })
+        }
+    </script>
 {% endblock %}

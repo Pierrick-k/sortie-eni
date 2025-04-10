@@ -12,11 +12,13 @@ use App\Repository\UserRepository;
 use App\Util\UpdateEtat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted('ROLE_USER')]
 #[Route('/sortie', name: 'sortie')]
 final class SortieController extends AbstractController
 {
@@ -25,7 +27,7 @@ final class SortieController extends AbstractController
         $sortie = $sortieRepository->findSortieById($id);
         if(!$sortie){
             //TODO: renvoyer sur une page d'erreur 404
-            return $this->redirectToRoute('sortie_liste');
+            return $this->redirectToRoute('sortie_list');
         }
 
         return $this->render('sortie/detail.html.twig', [
@@ -33,7 +35,6 @@ final class SortieController extends AbstractController
         ]);
     }
 
-    #[IsGranted('ROLE_USER')]
     #[Route('/create', name:'_create',methods:['GET','POST'])]
     public function create(EntityManagerInterface $em, Request $request, UserRepository $userRepository, UpdateEtat $updateEtat): Response{
         $sortie = new Sortie();
@@ -53,7 +54,7 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-    #[IsGranted('ROLE_USER')]
+
     #[Route('/update/{id}', name:'_update', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
     public function update(Sortie $sortie, EntityManagerInterface $em, Request $request, UpdateEtat $updateEtat): Response{
         $sortieForm = $this->createForm(SortieType::class, $sortie);
@@ -70,7 +71,7 @@ final class SortieController extends AbstractController
             'sortieForm' => $sortieForm,
         ]);
     }
-    #[IsGranted('ROLE_USER')]
+
     #[Route('/delete/{id}', name:'_delete', requirements: ["id"=>"\d+"], methods:['GET','POST'])]
     public function delete(Sortie $sortie, EntityManagerInterface $em): Response{
         $em->remove($sortie);
@@ -79,7 +80,6 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute('sortie_list');
     }
 
-    #[IsGranted('ROLE_USER')]
     #[Route('/publish/{id}', name:'_publish', requirements: ["id"=>"\d+"],methods:['GET','POST'])]
     public function publish(Sortie $sortie, UpdateEtat $updateEtat, EntityManagerInterface $em):Response{
         if($sortie->getEtat()->getLibelle() === "En création"){
@@ -101,18 +101,16 @@ final class SortieController extends AbstractController
 
         if( $FiltreSortie->isSubmitted()) :
             $sorties = $sortieRepository->findSortieByFilter($filtreSortieModel, $this->getUser());
-//            $this->addFlash('success', 'des résultats trouvés');
         else:
-//            $this->addFlash('success', 'On passe ici aussi');
             $sorties = $sortieRepository->findAll();
         endif;
-        dump($sorties);
 
         return $this->render('sortie/list.html.twig', [
             'sorties' => $sorties,
             'FiltreSortie' => $FiltreSortie,
         ]);
     }
+
     #[Route('/inscription/{id}', name:'_inscription', methods: ['GET','POST, PUT'])]
     public function inscription(Sortie $sortie, EntityManagerInterface $em): Response{
         $user = $this->getUser();
@@ -126,7 +124,8 @@ final class SortieController extends AbstractController
         }
         return $this->redirectToRoute('sortie_detail', ['id' => $sortie->getId()]);
     }
-    #[Route('/desinscription/{id}', name:'_desinscription', methods: ['delete', 'GET'])]
+
+    #[Route('/desinscription/{id}', name:'_desinscription', methods: ['DELETE', 'GET'])]
     public  function desinscription(Sortie $sortie, EntityManagerInterface $em): Response{
         $user = $this->getUser();
         if ($sortie->getParticipants()->contains($user)) {
@@ -138,6 +137,27 @@ final class SortieController extends AbstractController
             $this->addFlash('warning', 'Vous n\'êtes déjà pas inscrit à cette sortie');
         }
         return $this->redirectToRoute('sortie_detail', ['id' => $sortie->getId()]);
+
+    }
+
+    #[Route('/cancel/{id}', name:'_annulation', requirements: ["id" => "\d+"], methods: ['GET', 'POST'])]
+    public  function cancel(Sortie $sortie, EntityManagerInterface $em, Request $request, UpdateEtat $updateEtat): Response{
+        $user = $this->getUser();
+        if ($sortie->getOrganisateur() == $user || $this->isGranted('ROLE_ADMIN')) {
+            if ($updateEtat->updateEtat('Annulation', $sortie)) {
+                $sortie->appendInfosSortie($request->get('motif-annulation'));
+                $em->persist($sortie);
+                $em->flush();
+                $this->addFlash('success', 'La sortie à bien été Annulée !');
+
+                return $this->redirectToRoute('sortie_list', ['id'=> $sortie->getId()]);
+            } else {
+                $this->addFlash('danger', 'Action impossible');
+            }
+        } else {
+            $this->addFlash('warning', 'Annulation impossible');
+        }
+        return $this->redirectToRoute('sortie_list', ['id' => $sortie->getId()]);
 
     }
 }
