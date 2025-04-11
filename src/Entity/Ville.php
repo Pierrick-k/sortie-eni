@@ -25,6 +25,7 @@ class Ville
     #[Assert\Length(min: 3,max: 255,
         minMessage:'Le nom de la ville doit faire minimum 3 caracteres' ,
         maxMessage: 'Le nom de la ville doit faire 255 caracteres maximum')]
+    #[Groups(['lieuSorties'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 5)]
@@ -33,7 +34,7 @@ class Ville
     #[Assert\Type(type: 'numeric', message: 'Le code postal doit être un nombre.')]
     #[Assert\GreaterThan(value: 10,
         message: 'Le code postal doit être supérieur à 0' )]
-    #[Groups(['getInfosLieu'])]
+    #[Groups(['getInfosLieu','lieuSorties'])]
     private ?string $codePostal = null;
 
     /**

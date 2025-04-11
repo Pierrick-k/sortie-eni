@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -24,55 +25,66 @@ class Sortie
         minMessage: 'Le nom de la sortie doit être supérieur à 2 caractères',
         maxMessage: 'Le nom de la sortie doit être inférieur à 255 caractères')]
     #[ORM\Column(length: 255)]
+    #[Groups(['baseSorties'])]
     private ?string $nom = null;
 
     #[ORM\Column]
     #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
     #[Assert\NotBlank(message: 'La date et heure de début doit être renseigné')]
+    #[Groups(['baseSorties'])]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\Column]
     #[Assert\NotNull(message: 'La durée doit être renseigné')]
     #[Assert\Range(notInRangeMessage: 'La durée doit être entre 1 et 1440 minutes', min: 1,
         max: 1440)]
+    #[Groups(['baseSorties'])]
     private ?int $duree = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La date limite d\'inscription doit être renseignée')]
     #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
+    #[Groups(['baseSorties'])]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
     #[ORM\Column]
     #[Assert\NotNull(message: 'Le nombre d\'incription maximum doit être renseigné')]
+    #[Groups(['baseSorties'])]
     private ?int $nbInscriptionMax = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Length(min: 5, max: 255,
         minMessage: 'Les infos doivent avoir minimum 5 caractères',
         maxMessage: 'Les infos doivent être en dessous de 255 caractères')]
+    #[Groups(['baseSorties'])]
     private ?string $infosSortie = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['etatSorties'])]
     private ?Etat $etat = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['campusSorties'])]
     private ?Campus $campus = null;
 
     #[Assert\NotBlank(message: 'La lieu de la sortie doit être renseigné')]
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['lieuSorties'])]
     private ?Lieu $lieu = null;
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['baseSorties'])]
     private ?User $organisateur = null;
 
     /**
      * @var Collection<int, User>
      */
     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'sortiesPart')]
+    #[Groups(['participantsSorties'])]
     private Collection $participants;
 
     public function __construct()

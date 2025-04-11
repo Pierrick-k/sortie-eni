@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -36,15 +37,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['participantsSorties', 'baseSorties'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 180)]
+    #[Groups(['participantsSorties', 'baseSorties'])]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 10)]
     private ?string $telephone = null;
 
     #[ORM\Column]
+    #[Groups(['participantsSorties'])]
     private ?bool $actif = null;
 
     #[ORM\Column]

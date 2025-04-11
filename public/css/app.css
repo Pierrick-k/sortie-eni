@@ -29,3 +29,7 @@ footer {
     left: 75% !important;
     bottom: -35% !important;
 }
+
+.container {
+    margin-top: 2rem;
+}

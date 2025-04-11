@@ -17,23 +17,24 @@ class Lieu
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['lieuSorties'])]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getInfosLieu'])]
+    #[Groups(['getInfosLieu','lieuSorties'])]
     private ?string $rue = null;
 
     #[ORM\Column]
-    #[Groups(['getInfosLieu'])]
+    #[Groups(['getInfosLieu','lieuSorties'])]
     private ?float $latitude = null;
 
     #[ORM\Column]
-    #[Groups(['getInfosLieu'])]
+    #[Groups(['getInfosLieu','lieuSorties'])]
     private ?float $longitude = null;
 
     #[ORM\ManyToOne(inversedBy: 'lieux')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['getInfosLieu'])]
+    #[Groups(['getInfosLieu','lieuSorties'])]
     private ?Ville $ville = null;
 
     /**

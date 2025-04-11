@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Etat;
 use App\Entity\Sortie;
 use App\Entity\User;
 use App\Form\Model\FiltreSortieModel;
@@ -102,7 +103,8 @@ class SortieRepository extends ServiceEntityRepository
         //Filtre sur sortie "terminées"
         if (!empty($filtreSortieModel->sortiesTerminees)):
             $queryBuilder
-                ->andWhere("e.libelle = 'Terminée'");
+                ->andWhere('e.libelle = :terminees ')
+                ->setParameter('terminees', etat::TERMINEE);
         endif;
 
         //Filtre sur date début
@@ -117,6 +119,40 @@ class SortieRepository extends ServiceEntityRepository
             $queryBuilder
                 ->andWhere('s.dateHeureDebut <= :dateFin')
                 ->setParameter('dateFin', $filtreSortieModel->dateFin);
+        endif;
+
+        $query = $queryBuilder->getQuery();
+        return $query->getResult();
+    }
+
+    public function findSortieByAPIFilter(
+        ?Etat $etat,
+        ?\DateTimeImmutable $filterDateDebut,
+        ?\DateTimeImmutable $filterDateFin)
+    {
+        $queryBuilder = $this->createQueryBuilderSortie();
+
+        if(etat::checkEtat($etat, 1)) {
+           $validEtat = $etat;
+        }
+
+        //Masquage "terminées" et "en création"
+        $queryBuilder
+            ->andWhere('e.libelle NOT IN (:terminees, :en_creation) ')
+            ->setParameter('terminees', etat::TERMINEE)
+            ->setParameter('en_creation', etat::EN_CREATION);
+
+        if (!empty($validEtat)):
+            $queryBuilder
+                ->andWhere('e.libelle IN (:etat) ')
+                ->setParameter('etat', $validEtat);
+        endif;
+
+        //Filtre sur date début
+        if(!empty($filtreSortieModel->dateDebut)):
+            $queryBuilder
+                ->andWhere('s.dateHeureDebut >= :dateDebut')
+                ->setParameter('dateDebut', $filtreSortieModel->dateDebut);
         endif;
 
         $query = $queryBuilder->getQuery();

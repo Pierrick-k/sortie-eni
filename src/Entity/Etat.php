@@ -6,6 +6,7 @@ use App\Repository\EtatRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: EtatRepository::class)]
 class Etat
@@ -24,6 +25,7 @@ class Etat
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['etatSorties'])]
     private ?string $libelle = null;
 
     /**
@@ -35,6 +37,30 @@ class Etat
     public function __construct()
     {
         $this->sorties = new ArrayCollection();
+    }
+
+    public static function checkEtat(?Etat $etat, ?int $exclude)
+    {
+        $valid = false;
+        switch ($etat) {
+            case Etat::EN_CREATION:
+            case Etat::TERMINEE:
+                $valid = false;
+
+                if ($exclude != 1) {
+                    $valid = true;
+                }
+                break;
+            case Etat::OUVERTE:
+            case Etat::CLOTUREE:
+            case Etat::HISTORISEE:
+            case Etat::EN_COURS:
+            case Etat::ANNULEE:
+                $valid = true;
+
+                break;
+        }
+        return $valid;
     }
 
     public function getId(): ?int
