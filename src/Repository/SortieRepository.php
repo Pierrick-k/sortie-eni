@@ -131,10 +131,7 @@ class SortieRepository extends ServiceEntityRepository
         ?\DateTimeImmutable $filterDateFin)
     {
         $queryBuilder = $this->createQueryBuilderSortie();
-
-        if(etat::checkEtat($etat, 1)) {
-           $validEtat = $etat;
-        }
+        $queryBuilder->orderBy('s.dateHeureDebut', 'ASC');
 
         //Masquage "terminées" et "en création"
         $queryBuilder
@@ -142,20 +139,29 @@ class SortieRepository extends ServiceEntityRepository
             ->setParameter('terminees', etat::TERMINEE)
             ->setParameter('en_creation', etat::EN_CREATION);
 
-        if (!empty($validEtat)):
+        if (!empty($etat)):
             $queryBuilder
-                ->andWhere('e.libelle IN (:etat) ')
-                ->setParameter('etat', $validEtat);
+                ->andWhere('e.id = :etat ')
+                ->setParameter('etat', $etat);
         endif;
 
         //Filtre sur date début
-        if(!empty($filtreSortieModel->dateDebut)):
-            $queryBuilder
-                ->andWhere('s.dateHeureDebut >= :dateDebut')
-                ->setParameter('dateDebut', $filtreSortieModel->dateDebut);
+        if(!empty($filterDateDebut)):
+            if(!empty($filterDateFin)):
+                $queryBuilder
+                    ->andWhere('s.dateHeureDebut >= :dateDebut')
+                    ->setParameter('dateDebut', $filterDateDebut->format('Y-m-d H:i:s'))
+                    ->andWhere('s.dateHeureDebut <= :dateFin')
+                    ->setParameter('dateFin', $filterDateFin->format('Y-m-d H:i:s'));
+            else:
+                $queryBuilder
+                    ->andWhere('s.dateHeureDebut >= :dateDebut')
+                    ->setParameter('dateDebut', $filterDateDebut->format('Y-m-d H:i:s'));
+            endif;
         endif;
 
         $query = $queryBuilder->getQuery();
+
         return $query->getResult();
     }
 }

@@ -80,23 +80,23 @@
                     </td>
 
                     <td class="actionBtn">
-                        <a class="btn btn-sm btn-secondary" href="{{ path('sortie_detail',{id: sortie.id}) }}">Afficher</a>
+                        <a class="btn btn-sm btn-secondary my-1" href="{{ path('sortie_detail',{id: sortie.id}) }}">Afficher</a>
                         {% if sortie.etat.libelle == sortie.etat.EN_CREATION %}
-                            <a class="btn btn-sm btn-secondary" href="{{ path('sortie_publish',{id: sortie.id})}}">Publier</a>
+                            <a class="btn btn-sm btn-secondary my-1" href="{{ path('sortie_publish',{id: sortie.id})}}">Publier</a>
                         {% endif %}
                         {% if sortie.etat.libelle == sortie.etat.OUVERTE %}
                             {% if sortie.isParticipant(app.user)  %}
-                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_desinscription', {id: sortie.id}) }}">Se désister</a>
+                                <a class="btn btn-sm btn-warning my-1" href="{{ path('sortie_desinscription', {id: sortie.id}) }}">Se désister</a>
                             {% elseif sortie.participants|length < sortie.nbInscriptionMax %}
-                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
+                                <a class="btn btn-sm btn-success my-1" href="{{ path('sortie_inscription', {id: sortie.id}) }}">S'inscrire</a>
                             {% endif %}
                         {% endif %}
                         {%  if  sortie.etat.libelle in [sortie.etat.EN_CREATION, sortie.etat.OUVERTE, sortie.etat.ANNULEE, sortie.etat.EN_COURS] %}
                             {%  if (app.user.id == sortie.organisateur.id or is_granted('ROLE_ADMIN') ) %}
-                                <a class="btn btn-sm btn-secondary" href="{{ path('sortie_update', {id: sortie.id}) }}">Modifier</a>
-                                <a class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_delete', {id: sortie.id}) }}">Supprimer</a>
+                                <a class="btn btn-sm btn-secondary my-1" href="{{ path('sortie_update', {id: sortie.id}) }}">Modifier</a>
+                                <a class="btn btn-sm btn-danger my-1" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_delete', {id: sortie.id}) }}">Supprimer</a>
                                 {%  if sortie.etat.libelle != sortie.etat.ANNULEE %}
-                                    <a class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#cancelModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_annulation', {id: sortie.id}) }}">Annuler</a>
+                                    <a class="btn btn-sm btn-warning my-1" data-bs-toggle="modal" data-bs-target="#cancelModal" data-bs-libelle="{{ sortie.nom }}" data-bs-action="{{ path('sortie_annulation', {id: sortie.id}) }}">Annuler</a>
                                 {%  endif %}
                             {%  endif %}
                         {%  endif %}

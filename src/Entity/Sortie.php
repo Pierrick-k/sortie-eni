@@ -25,13 +25,13 @@ class Sortie
         minMessage: 'Le nom de la sortie doit être supérieur à 2 caractères',
         maxMessage: 'Le nom de la sortie doit être inférieur à 255 caractères')]
     #[ORM\Column(length: 255)]
-    #[Groups(['baseSorties'])]
+    #[Groups(['baseSorties','minimalSorties'])]
     private ?string $nom = null;
 
     #[ORM\Column]
     #[Assert\GreaterThan(value: 'tomorrow', message: 'La date doit être au moins un jour après celle d\'aujourd\'hui.')]
     #[Assert\NotBlank(message: 'La date et heure de début doit être renseigné')]
-    #[Groups(['baseSorties'])]
+    #[Groups(['baseSorties', 'minimalSorties'])]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\Column]

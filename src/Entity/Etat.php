@@ -39,28 +39,64 @@ class Etat
         $this->sorties = new ArrayCollection();
     }
 
-    public static function checkEtat(?Etat $etat, ?int $exclude)
+    public function etat(string $libelle)
+    {
+        $this->sorties = new ArrayCollection();
+        $this->libelle = $libelle;
+    }
+
+    public static function checkEtat(?string $etat, ?int $exclude)
     {
         $valid = false;
         switch ($etat) {
-            case Etat::EN_CREATION:
-            case Etat::TERMINEE:
+            case self::EN_CREATION:
+            case self::TERMINEE:
                 $valid = false;
 
                 if ($exclude != 1) {
                     $valid = true;
                 }
                 break;
-            case Etat::OUVERTE:
-            case Etat::CLOTUREE:
-            case Etat::HISTORISEE:
-            case Etat::EN_COURS:
-            case Etat::ANNULEE:
+            case self::OUVERTE:
+            case self::CLOTUREE:
+            case self::HISTORISEE:
+            case self::EN_COURS:
+            case self::ANNULEE:
                 $valid = true;
 
                 break;
         }
         return $valid;
+    }
+
+    public static function getEtat(mixed $etat): Etat
+    {
+        $convertEtat = null;
+        switch ($etat) {
+            case self::EN_CREATION:
+                $convertEtat = new Etat(self::EN_CREATION);
+                break;
+            case self::TERMINEE:
+                $convertEtat = new Etat(self::TERMINEE);
+                break;
+            case self::OUVERTE:
+                $convertEtat = new Etat(self::OUVERTE);
+                break;
+            case self::CLOTUREE:
+                $convertEtat = new Etat(self::CLOTUREE);
+                break;
+            case self::HISTORISEE:
+                $convertEtat = new Etat(self::HISTORISEE);
+                break;
+            case self::EN_COURS:
+                $convertEtat = new Etat(self::EN_COURS);
+                break;
+            case self::ANNULEE:
+                $convertEtat = new Etat(self::ANNULEE);
+                break;
+        }
+
+        return $convertEtat;
     }
 
     public function getId(): ?int
@@ -109,5 +145,11 @@ class Etat
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->libelle;
+    }
+
 
 }

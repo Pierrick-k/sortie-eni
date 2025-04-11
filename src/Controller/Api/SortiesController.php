@@ -2,38 +2,93 @@
 
 namespace App\Controller\Api;
 
+use App\Entity\Etat;
+use App\Repository\EtatRepository;
 use App\Repository\SortieRepository;
+use DateTimeInterface;
+use http\Env\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request as ApiRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final class SortiesController extends AbstractController
 {
+    const DEBUT_PLAGE = 1;
+    const FIN_PLAGE = 2;
+    const INTACTE = 3;
+
     #[Route('/api/sorties', name: 'api_sorties_list', methods: ["GET"])]
-    public function index(SortieRepository $sortieRepository, SerializerInterface $serializer): Response
+    public function index(
+        ApiRequest $request,
+        SortieRepository $sortieRepository,
+        EtatRepository $etatRepository,
+        SerializerInterface $serializer): Response
     {
-        /*
+        $body = $request->getContent();
+        $param = json_decode($body, true);
 
-         Une API doit permettre d’extraire la liste des sorties et être mise à
-disposition pour des applications tierces.
-Possibilité de filtrer les sorties selon l’état et la date prévue. On ne
-pourra pas extraire les sorties qui sont en cours de création ou
-terminées.
-3
-Gestion d’une API
-Liste des sorties
-L’API ne sera accessible uniquement pour des utilisateurs
-authentifiés.
+        $etat = null;
+        if (!empty($param['etat'])) {
+            if(etat::checkEtat($param['etat'], 1)) {
+                $etat = $etatRepository->findOneBy(["libelle"=>$param['etat']]);
+            }
+        }
 
-         */
+        $dateDebut = null;
+        if (!empty($param['dateDebut'])) {
+           $dateDebut = self::formatDate($param['dateDebut'], self::DEBUT_PLAGE);
+        }
 
+        $dateFin = null;
+        if (!empty($param['dateFin'])) {
+            $dateFin = self::formatDate($param['dateFin'], self::FIN_PLAGE);
+        } else {
+            if ($dateDebut !== null) {
+                $dateDebut = self::formatDate($param['dateDebut'], self::INTACTE);;
+            }
+        }
 
+        $groups = ["groups" => ['baseSorties', 'etatSorties', 'lieuSorties', 'campusSorties', 'participantsSorties']];
+        if (!empty($param['sortie'])) {
+            if($param['sortie'] == 'minimal') {
+                $groups = ["groups" => ['minimalSorties', 'etatSorties']];
+            }
+        }
 
-        $sorties = $sortieRepository->findBy([],["nom" => "ASC"]);
+        $sorties = $sortieRepository->findSortieByAPIFilter($etat, $dateDebut, $dateFin);
 
-        return $this->json($sorties, Response::HTTP_OK, [],  ["groups" => ['baseSorties', 'etatSorties', 'lieuSorties', 'campusSorties', 'participantsSorties']]);
-
+        return $this->json($sorties, Response::HTTP_OK, [],  $groups);
     }
+
+    private static function formatDate(string $myDate, ?int $position): \DateTimeImmutable
+    {
+        // 2004-02-12T15:19:21+00:00
+        $dateFormatee = \DateTimeImmutable::createFromFormat(DateTimeInterface::ISO8601, $myDate);
+        if (!$dateFormatee) {
+            // 2025-04-18 09:26:00
+            $dateFormatee = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $myDate);
+        }
+        if (!$dateFormatee) {
+            // 2025-04-18 09:26
+            $dateFormatee = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $myDate);
+        }
+        if (!$dateFormatee) {
+            // 2025-04-18
+            $dateFormatee = \DateTimeImmutable::createFromFormat('Y-m-d', $myDate);
+        }
+
+        if ( $position == 2 ) {
+            $date = new \DateTimeImmutable($dateFormatee->format('Y-m-d 23:59:59'));
+        } elseif($position == 1 ) {
+            $date = new \DateTimeImmutable($dateFormatee->format('Y-m-d 00:00:00'));
+        } else {
+            $date = new \DateTimeImmutable($dateFormatee->format('Y-m-d H:i:s'));
+        }
+
+        return $date;
+    }
+
 }
