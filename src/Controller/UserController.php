@@ -10,13 +10,14 @@ use App\Util\ManagerFile;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\String\Slugger\SluggerInterface;
 
-#[IsGranted('ROLE_USER')]
 #[Route('/user', name: 'user_')]
 final class UserController extends AbstractController
 {
@@ -63,7 +64,7 @@ final class UserController extends AbstractController
             throw new \LogicException('Erreur: L\'utilsateur n\'est pas une instance de: User.');
         }
         $userForm = $this->createForm(UserType::class, $user, [
-            'disabled_campus' => !in_array('ROLE_ADMIN', $this->getUser()->getRoles()),
+            'is_edit' => false,
         ]);
         $userForm->handleRequest($request);
         if ($userForm->isSubmitted() && $userForm->isValid()) {
@@ -106,7 +107,6 @@ final class UserController extends AbstractController
         }
         return $this->render('user/detail.html.twig', ["user" => $user]);
     }
-    /*
     #[Route('/profile', name: 'profile', methods: ['GET'])]
     public function profile(): Response{
         $user = $this->getUser();
@@ -121,15 +121,11 @@ final class UserController extends AbstractController
                                    Request $request,
                                    UserPasswordHasherInterface $passwordHasher,
                                    #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
-                                   SluggerInterface $slugger,
-                                   ManagerFile $managerFile): Response
+                                   SluggerInterface $slugger): Response
     {
         $user = $this->getUser();
         if (!$user) {
             throw $this->createNotFoundException();
-        }
-        if (!$user instanceof User) {
-            throw new \LogicException('L\'user n\'est pas un instance de: App\Entity\User.');
         }
         $userForm = $this->createForm(UserType::class, $user);
         $userForm->handleRequest($request);
@@ -139,27 +135,104 @@ final class UserController extends AbstractController
                 $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
                 $user->setPassword($hashedPassword);
             }
-            if($userForm->has('deleteImg')){
-                if ($userForm->get('deleteImg')->getData()) {
-                    if ($user->getFichier()) {
-                        $managerFile->delete($user->getFichier(), $fichierDirectory);
-                    }
-                    $user->setFichier(null);
-                }
-            }
             $fichier = $userForm->get('fichier')->getData();
             if($fichier){
-                $managerFile->upload($fichier, $fichierDirectory, $user);
+                $filePath=$fichierDirectory . '/' . $user->getFichier();
+                if($user->getFichier() != null){
+                    unlink($filePath);
+                }
+                $user->setFichier(null);
+
+                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
+
+                try {
+                    $fichier->move($fichierDirectory, $newFilename);
+                    $user->setFichier($newFilename);
+                } catch (FileException $e) {
+                    dd($e->getMessage());
+                }
             }
+
             $em->persist($user);
             $em->flush();
             $this->addFlash('success', 'Profile updated successfully.');
-            return $this->redirectToRoute('user_profile', ['id' => $user->getId()]);
         }
         return $this->render('user/update.html.twig', [
             'userForm' => $userForm,
-            'user'=>$user,
         ]);
     }
-*/
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/create', name: 'create', methods: ['GET', 'POST'])]
+    public function create(UserRepository $userRepository,
+                           EntityManagerInterface $em,
+                           Request $request,
+                           UserPasswordHasherInterface $passwordHasher,
+                           #[Autowire('%kernel.project_dir%/public/uploads/images/user')] string $fichierDirectory,
+                           SluggerInterface $slugger
+    ): Response
+    {
+        $user = new User();
+        $userForm = $this->createForm(UserType::class, $user,  [
+            'is_edit' => false,
+        ]);
+        $userForm->handleRequest($request);
+        if ($userForm->isSubmitted() && $userForm->isValid()) {
+            $user->setRoles(['ROLE_USER']);
+            $user->setActif(true);
+            $user->setAdministrateur(false);
+            $newPassword = $userForm->get('newPassword')->getData();
+            if ($newPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($user, $newPassword);
+                $user->setPassword($hashedPassword);
+            }
+            $fichier = $userForm->get('fichier')->getData();
+            if($fichier){
+                $filePath=$fichierDirectory . '/' . $user->getFichier();
+                if($user->getFichier() != null){
+                    unlink($filePath);
+                }
+                $user->setFichier(null);
+
+                $originalFilename = pathinfo($fichier->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $fichier->guessExtension();
+
+                try {
+                    $fichier->move($fichierDirectory, $newFilename);
+                    $user->setFichier($newFilename);
+                } catch (FileException $e) {
+                    dd($e->getMessage());
+                }
+            }
+            $em->persist($user);
+            $em->flush();
+            $this->addFlash('success', 'User added successfully.');
+            return $this->redirectToRoute('user_list');
+        }
+        return $this->render('user/create.html.twig', [
+            'userForm' => $userForm,
+        ]);
+    }
+    #[IsGranted('ROLE_ADMIN')]
+    #[Route('/delete/{id}', name: 'delete', requirements: ["id"=>"\d+"], methods:["GET","POST"])]
+    public function deleteUser($id, EntityManagerInterface $em , UserRepository $userRepository): Response {
+        $user = $userRepository->find($id);
+        if (!$user) {
+            throw $this->createNotFoundException();
+        }
+        if ($user->getSortiesPart()->count() > 0) {
+            $this->addFlash('danger', 'Impossible de supprimer un utilisateur inscrit à des sorties.');
+            return $this->redirectToRoute('user_list');
+        }
+        if ($user->getSorties()->count() > 0) {
+            $this->addFlash('danger', 'Impossible de supprimer un utilisateur qui organise une sortie.');
+            return $this->redirectToRoute('user_list');
+        }
+        $em->remove($user);
+        $em->flush();
+        $this->addFlash('success', 'User deleted successfully.');
+        return $this->redirectToRoute('user_list');
+    }
 }

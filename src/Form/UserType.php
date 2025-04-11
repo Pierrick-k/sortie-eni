@@ -53,7 +53,8 @@ class UserType extends AbstractType
                 'label' => 'Campus',
                 'class' => Campus::class,
                 'choice_label' => 'nom',
-                'disabled' => $options['disabled_campus'],
+                'disabled' => $options['is_edit'],
+                'mapped' => !$options['is_edit'],
             ])
             ->add('email', EmailType::class)
             ->add('nom', TextType::class)
@@ -99,7 +100,7 @@ class UserType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-            'disabled_campus' => true,
+            'is_edit' => false,
         ]);
     }
 }

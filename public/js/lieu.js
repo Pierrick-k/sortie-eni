@@ -19,3 +19,29 @@ if (selectLieu) {
         }
     });
 }
+
+var selectVille = document.getElementById('sortie_ville');
+
+if (selectVille) {
+    selectVille.addEventListener('change', function() {
+        const villeId = this.value;
+        selectLieu.innerHTML = '<option value="">--Choisissez un lieu--</option>';
+
+        if (villeId) {
+            fetch(`/api/lieu/par-ville/${villeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(lieu => {
+                        const option = document.createElement('option');
+                        option.value = lieu.id;
+                        option.textContent = lieu.nom;
+                        selectLieu.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement des lieux :', error);
+                });
+        }
+    });
+}
+
