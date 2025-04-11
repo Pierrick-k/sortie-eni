@@ -60,7 +60,6 @@ class FiltreSortieType extends AbstractType
                 ],
             ])
             ->add('nom', TextType::class, [
-                /*'label' => 'Le nom de la sortie contient',*/
                 'label' => '🔍',
                 'row_attr' => [
                     'class' => 'input-group w-auto d-inline-block mb-3',
