@@ -16,12 +16,7 @@
     {{ form_errors(sortieForm) }}
     {{ form_row(sortieForm.nbInscriptionMax) }}
     {{ form_row(sortieForm.duree) }}
-    <div>
-        <div class="groupe">
-            <span>Campus</span>
-            <span>{{ app.user.campus.nom }}</span>
-        </div>
-    </div>
+    {{ form_row(sortieForm.campus) }}
     {{ form_row(sortieForm.lieu) }}
     <div class="groupe">
         <div id="lieuInfos" hidden>

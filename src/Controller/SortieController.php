@@ -8,7 +8,6 @@ use App\Form\Model\FiltreSortieModel;
 use App\Form\SortieType;
 use App\Form\FiltreSortieType;
 use App\Repository\SortieRepository;
-use App\Repository\UserRepository;
 use App\Util\UpdateEtat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,7 +34,7 @@ final class SortieController extends AbstractController
 
     #[IsGranted('ROLE_USER')]
     #[Route('/create', name:'_create',methods:['GET','POST'])]
-    public function create(EntityManagerInterface $em, Request $request, UserRepository $userRepository, UpdateEtat $updateEtat): Response{
+    public function create(EntityManagerInterface $em, Request $request, UpdateEtat $updateEtat): Response{
         $sortie = new Sortie();
         $sortieForm = $this->createForm(SortieType::class, $sortie);
         $sortieForm->handleRequest($request);
