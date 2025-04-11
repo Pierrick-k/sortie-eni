@@ -66,3 +66,8 @@ td{
 .actionBtn a {
     font-size: xx-small;
 }
+
+#map {
+    width: 560px;
+    height: 380px;
+}
