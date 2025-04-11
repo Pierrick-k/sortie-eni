@@ -69,36 +69,6 @@ class Etat
         return $valid;
     }
 
-    public static function getEtat(mixed $etat): Etat
-    {
-        $convertEtat = null;
-        switch ($etat) {
-            case self::EN_CREATION:
-                $convertEtat = new Etat(self::EN_CREATION);
-                break;
-            case self::TERMINEE:
-                $convertEtat = new Etat(self::TERMINEE);
-                break;
-            case self::OUVERTE:
-                $convertEtat = new Etat(self::OUVERTE);
-                break;
-            case self::CLOTUREE:
-                $convertEtat = new Etat(self::CLOTUREE);
-                break;
-            case self::HISTORISEE:
-                $convertEtat = new Etat(self::HISTORISEE);
-                break;
-            case self::EN_COURS:
-                $convertEtat = new Etat(self::EN_COURS);
-                break;
-            case self::ANNULEE:
-                $convertEtat = new Etat(self::ANNULEE);
-                break;
-        }
-
-        return $convertEtat;
-    }
-
     public function getId(): ?int
     {
         return $this->id;
