@@ -74,8 +74,6 @@ le mot de passe des utilisateurs est par défaut leur prénom)_
 
 Lisez la liste des [contributeurs](https://github.com/Pierrick-k/sortie-eni/graphs/contributors) pour voir qui à aidé au projet !
 
-_(pour le lien mettez simplement l'URL de votre projet suivi de ``/contirubors``)_
-
 ## License
 
 Ce projet est sous licence ``CC BY NC ND`` - voir le fichier [LICENSE.md](LICENSE.md) pour plus d'informations
