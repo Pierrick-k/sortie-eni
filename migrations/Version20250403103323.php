@@ -23,7 +23,8 @@ final class Version20250403103323 extends AbstractMigration
         $this->addSql(<<<'SQL'
             ALTER TABLE user ADD campus_id INT DEFAULT NULL
         SQL);
-        $this->addSql('UPDATE user SET campus_id = (SELECT id FROM campus ORDER BY id LIMIT 1) WHERE campus_id IS NULL');
+        $this->addSql('INSERT INTO `campus` (`id`, `nom`) VALUES (\'0\', \'vide\')');
+        $this->addSql('UPDATE user SET campus_id = 0 WHERE campus_id IS NULL');
         $this->addSql(<<<'SQL'
         ALTER TABLE user MODIFY campus_id INT NOT NULL
     SQL);
