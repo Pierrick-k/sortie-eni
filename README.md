@@ -50,10 +50,10 @@ Si vous configurez le mailer en localhost vous pourrez utiliser un logiciel comm
 
 1 : Exécuter la commande ``symfony serve -d`` afin de lancer le serveur
 
-2 : Puis vous pouvez vous connecter sur votre application avec la commande ``symfony open:local`` qui ouvrira sur votre navigateur par défaut une page à l'adresse de votre serveur http://127.0.0.1:80000 par défaut
+2 : Puis vous pouvez vous connecter sur votre application avec la commande ``symfony open:local`` qui ouvrira, sur votre navigateur favori, une page à l'adresse du serveur (http://127.0.0.1:8000 par défaut)
 
-_(Dans un premier temps vous pouvez vous connecter avec l'utilisateur "admin@eni.com" mot de passe "admin" puis créer votre utilisateur ou en utiliser 1 déjà créer
-le mot de passe des utilisateurs est par défaut leur prénom)_ 
+_(Dans un premier temps vous pouvez vous connecter avec l'utilisateur "admin@eni.com" mot de passe "admin" puis créer votre utilisateur ou en utiliser 1 déjà créé
+le mot de passe des utilisateurs généré par défaut est leur prénom)_ 
 ![Exemple-connexion.png](Exemple-connexion.png)
 
 ## Fabriqué avec
@@ -72,10 +72,8 @@ le mot de passe des utilisateurs est par défaut leur prénom)_
 * **Pierrick** _alias_ [@Pierrick-k](https://github.com/Pierrick-k)
 * **Valentin** _alias_ [@ValentinJG](https://github.com/ValentinJG)
 
-Lisez la liste des [contributeurs](https://github.com/Pierrick-k/sortie-eni/graphs/contributors) pour voir qui à aidé au projet !
+Lisez la liste des [contributeurs](https://github.com/Pierrick-k/sortie-eni/graphs/contributors) pour voir qui a aidé au projet !
 
 ## License
 
-Ce projet est sous licence ``CC BY NC ND`` - voir le fichier [LICENSE.md](LICENSE.md) pour plus d'informations
-
-
+Ce projet est sous licence ``CC BY NC ND``
