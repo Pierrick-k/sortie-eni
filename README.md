@@ -38,7 +38,7 @@ JWT_PASSPHRASE=ma_pass_phrase
 ````
 Si vous configurez le mailer en localhost vous pourrez utiliser un logiciel comme Papercut afin de recevoir les mails envoyés.
 
-5 : Créer l'utilisateur sur votre SGBD avec les droits suffisant afin de créer une nouvelle database et toute la structure.
+5 : Créer l'utilisateur sur votre SGBD avec des droits suffisants pour créer une nouvelle database et toute sa structure.
 
 6 : Exécuter la commande ``symfony console doctrine:database:create`` pour créer la base
 
